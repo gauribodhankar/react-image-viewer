@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import Image from './Image.js'
 
 class ImageViewer extends Component {
   
@@ -14,7 +15,7 @@ class ImageViewer extends Component {
   
   fetchImages() {
     fetch(
-      '/data/imageData.json'
+      '/data/testData.json'
     ).then(response => {
       // TODO: add error handling
       return response.json();
@@ -42,6 +43,19 @@ class ImageViewer extends Component {
     return (
       <div className='hello-world'>
         <h1>Images will be displayed here</h1>
+        <div id="all-images-container">
+          {this.state.images.map((image, index) => {
+            return <Image
+              key={image.assetId}
+              index={index}
+              url={image.url}
+              height={image.height}
+              width={image.width}
+              movieId={image.movieId}
+              deploymentTs={image.deploymentTs}>
+            </Image>;
+          })}
+        </div>
       </div>
     )
   }
