@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import Image from './Image.js'
+import './../styles/ImageViewer.css'
 
 class ImageViewer extends Component {
   
@@ -41,9 +42,8 @@ class ImageViewer extends Component {
 
   render() {
     return (
-      <div className='hello-world'>
-        <h1>Images will be displayed here</h1>
-        <div id="all-images-container">
+      <div className='image-viewer'>
+        <div id="images-container">
           {this.state.images.map((image, index) => {
             return <Image
               key={image.assetId}
