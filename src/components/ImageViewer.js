@@ -7,11 +7,22 @@ class ImageViewer extends Component {
   constructor() {
     super();
     this.state = {
-      images: []
+      images: [],
+      dragIndex: null,
+      dropIndex: null
     };
   }
   componentWillMount() {
     this.fetchImages();
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if((nextState.dragIndex !== null && nextState.dropIndex !== null) && nextState.dragIndex !== nextState.dropIndex) {
+      let reorderedImages = Object.assign([], this.state.images);
+      reorderedImages[nextState.dragIndex] = this.state.images[nextState.dropIndex];
+      reorderedImages[nextState.dropIndex] = this.state.images[nextState.dragIndex];
+      this.setState({images: reorderedImages, dragIndex: null, dropIndex: null});
+    }
   }
   
   fetchImages() {
@@ -34,8 +45,6 @@ class ImageViewer extends Component {
         }
         return prevImage;
       });
-      // TODO: remove console statements
-      console.log(imageArray);
       this.setState({images: imageArray});
     });
   }
@@ -52,7 +61,13 @@ class ImageViewer extends Component {
               height={image.height}
               width={image.width}
               movieId={image.movieId}
-              deploymentTs={image.deploymentTs}>
+              deploymentTs={image.deploymentTs}
+              onDragInit={(dragIndex)=> {
+                this.setState({dragIndex});
+              }}
+              onDragDropComplete={(dropIndex)=> {
+                this.setState({dropIndex});
+              }}>
             </Image>;
           })}
         </div>
