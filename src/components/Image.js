@@ -10,6 +10,7 @@ class Image extends Component {
         return (
             <div className="image">
                 <img 
+                    className="movie-img"
                     id={this.props.assetId}
                     index={this.props.index} 
                     src={this.props.url} 
@@ -21,7 +22,7 @@ class Image extends Component {
                     onDrop={() => {
                         this.props.handleDrop(this.props.index);
                     }} 
-                    onerror={this.props.handleImageError} />
+                    onError={this.props.handleImageError} />
             </div>
         )
     }
@@ -30,8 +31,8 @@ export default Image;
 
 /*
 image onerror - what happens if the page fails to load
-drag-drop functionality needs to be in the parent
-try to have stateless components
+DONE drag-drop functionality needs to be in the parent
+DONEtry to have stateless components
 popover component
 popover control should also be with the parent
 image rendering - 

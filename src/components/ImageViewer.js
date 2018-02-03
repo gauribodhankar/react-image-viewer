@@ -8,8 +8,12 @@ class ImageViewer extends Component {
     super();
     this.state = {
       images: [],
+      loadedImages: [],
       dragIndex: null,
-      dropIndex: null
+      dropIndex: null,
+      imageLimit: 50,
+      startIndex: 0,
+      currentIndex:0
     };
     this.handleImageError = this.handleImageError.bind(this);
   }
@@ -19,16 +23,16 @@ class ImageViewer extends Component {
 
   componentWillUpdate(nextProps, nextState) {
     if((nextState.dragIndex !== null && nextState.dropIndex !== null) && nextState.dragIndex !== nextState.dropIndex) {
-      const reorderedImages = Object.assign([], this.state.images);
-      reorderedImages[nextState.dragIndex] = this.state.images[nextState.dropIndex];
-      reorderedImages[nextState.dropIndex] = this.state.images[nextState.dragIndex];
-      this.setState({images: reorderedImages, dragIndex: null, dropIndex: null});
+      const reorderedImages = Object.assign([], this.state.loadedImages);
+      reorderedImages[nextState.dragIndex] = this.state.loadedImages[nextState.dropIndex];
+      reorderedImages[nextState.dropIndex] = this.state.loadedImages[nextState.dragIndex];
+      this.setState({loadedImages: reorderedImages, dragIndex: null, dropIndex: null});
     }
   }
   
   fetchImages() {
     fetch(
-      '/data/testData.json'
+      '/data/imageData.json'
     ).then(response => {
       // TODO: add error handling
       return response.json();
@@ -46,7 +50,7 @@ class ImageViewer extends Component {
         }
         return prevImage;
       });
-      this.setState({images: imageArray});
+      this.setState({images: imageArray, loadedImages: imageArray.slice(this.state.startIndex, this.state.startIndex+30)});
     });
   }
 
@@ -58,7 +62,7 @@ class ImageViewer extends Component {
     return (
       <div className='image-viewer'>
         <div id="images-container">
-          {this.state.images.map((image, index) => {
+          {this.state.loadedImages.map((image, index) => {
             return <Image
               key={image.assetId}
               index={index}
