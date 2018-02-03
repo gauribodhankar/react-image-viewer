@@ -2,26 +2,9 @@ import React, { Component } from 'react'
 
 class Image extends Component {
 
-    constructor(props) {
-        super(props);
-
-        this.handleDragStart = this.handleDragStart.bind(this);
-        this.handleDragOver = this.handleDragOver.bind(this);
-        this.handleDrop = this.handleDrop.bind(this);
-    }
-
-    handleDragStart(event) {
-        this.props.onDragInit(this.props.index);
-    }
-
-    handleDragOver(event) {
-        // event handler reports whether or not the drop target is potentially willing to accept the drop, by canceling the event
-        event.preventDefault();
-    }
-
-    handleDrop(event) {
-        this.props.onDragDropComplete(this.props.index);
-    }
+    constructor(props) { // TODO: do we need the constructor
+        super(props);       
+    } 
 
     render() {
         return (
@@ -31,11 +14,29 @@ class Image extends Component {
                     index={this.props.index} 
                     src={this.props.url} 
                     draggable="true"
-                    onDragStart={this.handleDragStart}
-                    onDragOver={this.handleDragOver}
-                    onDrop={this.handleDrop} />
+                    onDragStart={() => {
+                        this.props.handleDragStart(this.props.index);
+                    }}
+                    onDragOver={this.props.handleDragOver}
+                    onDrop={() => {
+                        this.props.handleDrop(this.props.index);
+                    }} 
+                    onerror={this.props.handleImageError} />
             </div>
         )
     }
 }
 export default Image;
+
+/*
+image onerror - what happens if the page fails to load
+drag-drop functionality needs to be in the parent
+try to have stateless components
+popover component
+popover control should also be with the parent
+image rendering - 
+- counter/limit
+load more link
+- at a time there can be only x no of images/dom nodes on the page
+as user moves down, remove the top nodes that are no longer visible to the user
+*/

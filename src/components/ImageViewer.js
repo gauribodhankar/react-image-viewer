@@ -11,6 +11,7 @@ class ImageViewer extends Component {
       dragIndex: null,
       dropIndex: null
     };
+    this.handleImageError = this.handleImageError.bind(this);
   }
   componentWillMount() {
     this.fetchImages();
@@ -18,7 +19,7 @@ class ImageViewer extends Component {
 
   componentWillUpdate(nextProps, nextState) {
     if((nextState.dragIndex !== null && nextState.dropIndex !== null) && nextState.dragIndex !== nextState.dropIndex) {
-      let reorderedImages = Object.assign([], this.state.images);
+      const reorderedImages = Object.assign([], this.state.images);
       reorderedImages[nextState.dragIndex] = this.state.images[nextState.dropIndex];
       reorderedImages[nextState.dropIndex] = this.state.images[nextState.dragIndex];
       this.setState({images: reorderedImages, dragIndex: null, dropIndex: null});
@@ -32,7 +33,7 @@ class ImageViewer extends Component {
       // TODO: add error handling
       return response.json();
     }).then((imageData) => {
-      let imageArray = [];
+      const imageArray = [];
       imageData.reduce((prevImage, image) => {
         prevImage = prevImage || {};
 
@@ -49,6 +50,10 @@ class ImageViewer extends Component {
     });
   }
 
+  handleImageError() {
+    //TODO: show default image if image does not load
+  }
+
   render() {
     return (
       <div className='image-viewer'>
@@ -62,12 +67,16 @@ class ImageViewer extends Component {
               width={image.width}
               movieId={image.movieId}
               deploymentTs={image.deploymentTs}
-              onDragInit={(dragIndex)=> {
+              handleDragStart={(dragIndex)=> {
                 this.setState({dragIndex});
               }}
-              onDragDropComplete={(dropIndex)=> {
+              handleDragOver={(event) => {
+                event.preventDefault();
+              }}
+              handleDrop={(dropIndex)=> {
                 this.setState({dropIndex});
-              }}>
+              }}
+              handleImageError={this.handleImageError}>
             </Image>;
           })}
         </div>
@@ -75,4 +84,4 @@ class ImageViewer extends Component {
     )
   }
 }
-export default ImageViewer 
+export default ImageViewer
