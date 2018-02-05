@@ -53,4 +53,5 @@ TODO: loading/spinner
 TODO: default image if image does not load
 TODO: provide alt text
 TODO: convert timestamp to a proper date
+TODO: Animate/make the image bigger on hover
 */

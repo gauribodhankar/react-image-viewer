@@ -12,12 +12,20 @@ class ImageViewer extends Component {
       loadedImages: [],
       dragIndex: null,
       dropIndex: null,
-      imageLimit: 50,
+      imageLimit: 100,
+      imageFetchCount: 30,
       startIndex: 0,
+      endIndex: 30,
       currentIndex:0
     };
     this.handleImageError = this.handleImageError.bind(this);
+    this.handleOnScroll = this.handleOnScroll.bind(this);
   }
+
+  componentDidMount() {
+    window.addEventListener('scroll', this.handleOnScroll, false);
+  }
+
   componentWillMount() {
     this.fetchImages();
   }
@@ -31,6 +39,10 @@ class ImageViewer extends Component {
     }
   }
   
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleOnScroll, false);
+  }
+
   fetchImages() {
     fetch(
       '/data/imageData.json'
@@ -53,7 +65,12 @@ class ImageViewer extends Component {
         }
         return prevImage;
       });
-      this.setState({images: imageArray, loadedImages: imageArray.slice(this.state.startIndex, this.state.startIndex+30)});
+      this.setState({
+        images: imageArray, 
+        loadedImages: imageArray.slice(this.state.startIndex, this.state.endIndex),
+        startIndex: this.state.endIndex,
+        endIndex: this.state.endIndex + this.state.imageFetchCount
+      });
     });
   }
 
@@ -61,32 +78,41 @@ class ImageViewer extends Component {
     //TODO: show default image if image does not load
   }
 
+  handleOnScroll() {
+    console.log('scrolling', window.scrollY, document.getElementById('images-container').offsetHeight);
+    if((window.innerHeight + window.scrollY) >= (document.getElementById('images-container').clientHeight - 500)) {
+      this.setState({
+        loadedImages: this.state.images.slice(0, this.state.endIndex),
+        startIndex: this.state.endIndex,
+        endIndex: this.state.endIndex + this.state.imageFetchCount
+      });
+    }
+  }
+
   render() {
     return (
-      <div className='image-viewer'>
-        <div id="images-container">
-          {this.state.loadedImages.map((image, index) => {
-            return <Image
-              key={image.assetId}
-              index={index}
-              url={image.url}
-              height={image.height}
-              width={image.width}
-              movieId={image.movieId}
-              deploymentTs={image.deploymentTs}
-              handleDragStart={(dragIndex)=> {
-                this.setState({dragIndex});
-              }}
-              handleDragOver={(event) => {
-                event.preventDefault();
-              }}
-              handleDrop={(dropIndex)=> {
-                this.setState({dropIndex});
-              }}
-              handleImageError={this.handleImageError}>
-            </Image>;
-          })}
-        </div>
+      <div className='image-viewer' id="images-container">
+        {this.state.loadedImages.map((image, index) => {
+          return <Image
+            key={image.assetId}
+            index={index}
+            url={image.url}
+            height={image.height}
+            width={image.width}
+            movieId={image.movieId}
+            deploymentTs={image.deploymentTs}
+            handleDragStart={(dragIndex)=> {
+              this.setState({dragIndex});
+            }}
+            handleDragOver={(event) => {
+              event.preventDefault();
+            }}
+            handleDrop={(dropIndex)=> {
+              this.setState({dropIndex});
+            }}
+            handleImageError={this.handleImageError}>
+          </Image>;
+        })}
       </div>
     )
   }
