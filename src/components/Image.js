@@ -8,21 +8,29 @@ class Image extends Component {
 
     render() {
         return (
-            <div className="image">
+            <div 
+                className="image"
+                draggable="true"
+                onDragStart={() => {
+                    this.props.handleDragStart(this.props.index);
+                }}
+                onDragOver={this.props.handleDragOver}
+                onDrop={() => {
+                    this.props.handleDrop(this.props.index);
+                }}>
                 <img 
-                    className="movie-img"
+                    className="movie-image"
                     id={this.props.assetId}
                     index={this.props.index} 
                     src={this.props.url} 
-                    draggable="true"
-                    onDragStart={() => {
-                        this.props.handleDragStart(this.props.index);
-                    }}
-                    onDragOver={this.props.handleDragOver}
-                    onDrop={() => {
-                        this.props.handleDrop(this.props.index);
-                    }} 
                     onError={this.props.handleImageError} />
+
+                <div className="overlay"></div>
+                <div className="image-details">
+                    <span className="image-details-item">ID: {this.props.movieId}</span>
+                    <span className="image-details-item">{this.props.height} X {this.props.width}</span>
+                    <span className="image-details-item">{this.props.deploymentTs}</span>
+                </div>
             </div>
         )
     }
@@ -40,4 +48,9 @@ image rendering -
 load more link
 - at a time there can be only x no of images/dom nodes on the page
 as user moves down, remove the top nodes that are no longer visible to the user
+
+TODO: loading/spinner
+TODO: default image if image does not load
+TODO: provide alt text
+TODO: convert timestamp to a proper date
 */
