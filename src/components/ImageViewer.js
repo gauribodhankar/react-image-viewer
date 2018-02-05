@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import Image from './Image.js'
+import dateFormat from 'dateformat'
 import './../styles/ImageViewer.css'
 
 class ImageViewer extends Component {
@@ -44,6 +45,8 @@ class ImageViewer extends Component {
         if(prevImage.assetId === image.assetId) {
           Object.assign(prevImage, image);
           prevImage.url = `https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`;
+          const timestamp = new Date(image.deploymentTs);
+          prevImage.deploymentTs = dateFormat(timestamp, "mm/dd/yyyy hh:mm");
           imageArray.push(prevImage);
         } else {
           prevImage = image;

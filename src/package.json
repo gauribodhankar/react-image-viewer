@@ -10,6 +10,7 @@
   "author": "Gauri Bodhankar",
   "license": "ISC",
   "dependencies": {
+    "dateformat": "^3.0.2",
     "react": "^16.2.0",
     "react-dom": "^16.2.0"
   },
