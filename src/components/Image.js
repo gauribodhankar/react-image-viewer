@@ -54,4 +54,5 @@ TODO: default image if image does not load
 TODO: provide alt text
 TODO: convert timestamp to a proper date
 TODO: Animate/make the image bigger on hover
+TODO: create a helper for the fetch call that exports a function with params start index, end index and fetch each time
 */

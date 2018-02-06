@@ -12,7 +12,7 @@ class ImageViewer extends Component {
       loadedImages: [],
       dragIndex: null,
       dropIndex: null,
-      imageLimit: 100,
+      threshold: 100,
       imageFetchCount: 30,
       startIndex: 0,
       endIndex: 30,
@@ -79,13 +79,21 @@ class ImageViewer extends Component {
   }
 
   handleOnScroll() {
-    console.log('scrolling', window.scrollY, document.getElementById('images-container').offsetHeight);
     if((window.innerHeight + window.scrollY) >= (document.getElementById('images-container').clientHeight - 500)) {
-      this.setState({
-        loadedImages: this.state.images.slice(0, this.state.endIndex),
-        startIndex: this.state.endIndex,
-        endIndex: this.state.endIndex + this.state.imageFetchCount
-      });
+      if(this.state.loadedImages.length <= 100) {
+        this.setState({
+          loadedImages: this.state.images.slice(0, this.state.endIndex),
+          startIndex: this.state.endIndex,
+          endIndex: this.state.endIndex + this.state.imageFetchCount
+        });
+      } else {
+        this.setState({
+          loadedImages: this.state.images.slice(this.state.endIndex-100, this.state.endIndex),
+          startIndex: this.state.endIndex,
+          endIndex: this.state.endIndex + this.state.imageFetchCount
+        });
+      }
+      console.log(this.state);
     }
   }
 
