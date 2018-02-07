@@ -84,14 +84,17 @@ class ImageViewer extends Component {
     this.currentScrollTop =  window.scrollY;
 
     if(this.currentScrollTop < this.prevScrollTop) {  // scroll-up
-      // if(window.scrollY < 500 && this.state.startIndex !== 0) {
-      //   this.setState({
-      //     loadedImages: this.state.images.slice(startIndex, this.state.startIndex)
-      //   });
-      // }
-      // console.log('if if < 90', this.startIndex, this.endIndex, this.state.loadedImages.length);
+      if(window.scrollY < 500 && this.state.startIndex !== 0 && (this.state.loadedImages.length === this.threshold)) {
+        // console.log('up', this.startIndex, this.endIndex, this.state.loadedImages.length);
+        this.startIndex = (this.startIndex - this.imageFetchCount) < 0 ? 0 : (this.startIndex - this.imageFetchCount); 
+        this.endIndex = (this.endIndex - this.imageFetchCount) < 0 ? 0 : (this.endIndex - this.imageFetchCount); 
+        this.setState({
+          loadedImages: this.state.images.slice(this.startIndex, this.endIndex)
+        });
+      }
     } else if(this.currentScrollTop > this.prevScrollTop) { // scroll-down
       if((window.innerHeight + window.scrollY) >= (document.getElementById('images-container').clientHeight - 500)) {
+        // console.log('down', this.startIndex, this.endIndex, this.state.loadedImages.length);
         this.endIndex = this.endIndex + this.imageFetchCount;
         if(this.state.loadedImages.length < this.threshold) {
           this.setState({
