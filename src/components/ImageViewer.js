@@ -29,12 +29,11 @@ class ImageViewer extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener('scroll', _.throttle(() => this.handleOnScroll, 100), false);
+    window.addEventListener('scroll', throttle(() => {this.handleOnScroll();}, 500, {leading: true}), false);
   }
 
   componentWillMount() {
     this.fetchImages();
-    // this.newFetchImages();
   }
 
   componentWillUpdate(nextProps, nextState) {
@@ -53,7 +52,6 @@ class ImageViewer extends Component {
   fetchImages() {
     FetchHandler.fetchImages('/data/imageData.json', this.startIndex, this.endIndex).then((imageData) => {
       const imageArray = [];
-      console.log(imageData);
         imageData.reduce((prevImage, image) => {
           prevImage = prevImage || {};
   
@@ -76,35 +74,6 @@ class ImageViewer extends Component {
     });
   }
 
-  newFetchImages() {
-    fetch(
-      '/data/imageData.json'
-    ).then(response => {
-      // TODO: add error handling
-      return response.json();
-    }).then((imageData) => {
-      const imageArray = [];
-      imageData.reduce((prevImage, image) => {
-        prevImage = prevImage || {};
-
-        if(prevImage.assetId === image.assetId) {
-          Object.assign(prevImage, image);
-          prevImage.url = `https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`;
-          const timestamp = new Date(image.deploymentTs);
-          prevImage.deploymentTs = dateFormat(timestamp, "mm/dd/yyyy hh:mm");
-          imageArray.push(prevImage);
-        } else {
-          prevImage = image;
-        }
-        return prevImage;
-      });
-      this.setState({
-        images: imageArray, 
-        loadedImages: imageArray.slice(this.startIndex, this.endIndex)
-      });
-    });
-  }
-
   handleImageError() {
     //TODO: show default image if image does not load
   }
@@ -112,35 +81,21 @@ class ImageViewer extends Component {
   handleOnScroll() {
     this.prevScrollTop = this.currentScrollTop;
     this.currentScrollTop =  window.scrollY;
-
     if(this.currentScrollTop < this.prevScrollTop) {  // scroll-up
       if(window.scrollY < 500 && this.state.startIndex !== 0 && (this.state.loadedImages.length === this.threshold)) {
-        console.log('up', this.startIndex, this.endIndex, this.state.loadedImages.length);
         this.startIndex = (this.startIndex - this.imageFetchCount) < 0 ? 0 : (this.startIndex - this.imageFetchCount); 
         this.endIndex = (this.endIndex - this.imageFetchCount) < 0 ? 0 : (this.endIndex - this.imageFetchCount); 
         this.fetchImages();
-        // this.setState({
-        //   loadedImages: this.state.images.slice(this.startIndex, this.endIndex)
-        // });
+        console.log('up', this.startIndex, this.endIndex, this.state.loadedImages.length);
       }
     } else if(this.currentScrollTop > this.prevScrollTop) { // scroll-down
       if((window.innerHeight + window.scrollY) >= (document.getElementById('images-container').clientHeight - 500)) {
         this.endIndex = this.endIndex + this.imageFetchCount;
-        // console.log('loaded images', this.state.loadedImages.length);
-        if(this.state.loadedImages.length < this.threshold) {
-          this.fetchImages();
-          console.log('if', this.startIndex, this.endIndex, this.state.loadedImages.length);
-          // this.setState({
-          //   loadedImages: this.state.images.slice(this.startIndex, this.endIndex)
-          // });
-        } else {
+        if(!(this.state.loadedImages.length < this.threshold)) {
           this.startIndex = this.startIndex + this.imageFetchCount;
-          this.fetchImages();
-          console.log('else', this.startIndex, this.endIndex, this.state.loadedImages.length);
-          // this.setState({
-          //   loadedImages: this.state.images.slice(this.startIndex, this.endIndex)
-          // });
         }
+        this.fetchImages();
+        console.log('down', this.startIndex, this.endIndex, this.state.loadedImages.length);
       }
     }
   }

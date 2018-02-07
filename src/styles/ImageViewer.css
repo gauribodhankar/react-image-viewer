@@ -11,6 +11,7 @@
     width: 200px;
     margin: 5px;
     float: left;
+    background-color: brown;
 }
 .movie-image {
     height: 250px;

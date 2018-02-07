@@ -56,4 +56,5 @@ TODO: convert timestamp to a proper date
 TODO: Animate/make the image bigger on hover
 TODO: create a helper for the fetch call that exports a function with params start index, end index and fetch each time
 TODO: show backgroud color before image loads
+TODO: use li or div for images?
 */
