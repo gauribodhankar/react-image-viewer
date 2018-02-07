@@ -4,20 +4,23 @@ import dateFormat from 'dateformat'
 import './../styles/ImageViewer.css'
 
 class ImageViewer extends Component {
-  
   constructor() {
     super();
     this.state = {
       images: [],
       loadedImages: [],
       dragIndex: null,
-      dropIndex: null,
-      threshold: 100,
-      imageFetchCount: 30,
-      startIndex: 0,
-      endIndex: 30,
-      currentIndex:0
+      dropIndex: null
     };
+
+    this.currentScrollTop = 0;
+    this.prevScrollTop = 0;
+
+    this.threshold = 90;
+    this.startIndex = 0;
+    this.imageFetchCount = 30;
+    this.endIndex = this.startIndex + this.imageFetchCount;
+  
     this.handleImageError = this.handleImageError.bind(this);
     this.handleOnScroll = this.handleOnScroll.bind(this);
   }
@@ -67,9 +70,7 @@ class ImageViewer extends Component {
       });
       this.setState({
         images: imageArray, 
-        loadedImages: imageArray.slice(this.state.startIndex, this.state.endIndex),
-        startIndex: this.state.endIndex,
-        endIndex: this.state.endIndex + this.state.imageFetchCount
+        loadedImages: imageArray.slice(this.startIndex, this.endIndex)
       });
     });
   }
@@ -79,21 +80,30 @@ class ImageViewer extends Component {
   }
 
   handleOnScroll() {
-    if((window.innerHeight + window.scrollY) >= (document.getElementById('images-container').clientHeight - 500)) {
-      if(this.state.loadedImages.length <= 100) {
-        this.setState({
-          loadedImages: this.state.images.slice(0, this.state.endIndex),
-          startIndex: this.state.endIndex,
-          endIndex: this.state.endIndex + this.state.imageFetchCount
-        });
-      } else {
-        this.setState({
-          loadedImages: this.state.images.slice(this.state.endIndex-100, this.state.endIndex),
-          startIndex: this.state.endIndex,
-          endIndex: this.state.endIndex + this.state.imageFetchCount
-        });
+    this.prevScrollTop = this.currentScrollTop;
+    this.currentScrollTop =  window.scrollY;
+
+    if(this.currentScrollTop < this.prevScrollTop) {  // scroll-up
+      // if(window.scrollY < 500 && this.state.startIndex !== 0) {
+      //   this.setState({
+      //     loadedImages: this.state.images.slice(startIndex, this.state.startIndex)
+      //   });
+      // }
+      // console.log('if if < 90', this.startIndex, this.endIndex, this.state.loadedImages.length);
+    } else if(this.currentScrollTop > this.prevScrollTop) { // scroll-down
+      if((window.innerHeight + window.scrollY) >= (document.getElementById('images-container').clientHeight - 500)) {
+        this.endIndex = this.endIndex + this.imageFetchCount;
+        if(this.state.loadedImages.length < this.threshold) {
+          this.setState({
+            loadedImages: this.state.images.slice(this.startIndex, this.endIndex)
+          });
+        } else {
+          this.startIndex = this.startIndex + this.imageFetchCount;
+          this.setState({
+            loadedImages: this.state.images.slice(this.startIndex, this.endIndex)
+          });
+        }
       }
-      console.log(this.state);
     }
   }
 
