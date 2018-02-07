@@ -3,6 +3,12 @@ define('fetch-helper', [
 ], function() {
     'use strict'
 
+    /**
+     * To return a promise with the images requested depending on the start & end index passed to it
+     * @param {*} url 
+     * @param {*} startIndex 
+     * @param {*} endIndex 
+     */
     const fetchImages = (url, startIndex, endIndex) => new Promise((resolve, reject) => {
         fetch(
             url
