@@ -1,10 +1,9 @@
 import React, {Component} from 'react'
 import Image from './Image.js'
+import Error from './Error.js'
 import dateFormat from 'dateformat'
 import './../styles/ImageViewer.css'
-import FetchHandler from './../helpers/fetchHandler.js'
-import _ from 'underscore'
-import throttle from 'lodash.throttle'
+import { fetchImages } from './../helpers/fetchHandler.js'
 
 class ImageViewer extends Component {
   constructor() {
@@ -12,7 +11,10 @@ class ImageViewer extends Component {
     this.state = {
       loadedImages: [],
       dragIndex: null,  // index of the image being dragged
-      dropIndex: null   // index of the drop target
+      dropIndex: null,   // index of the drop target
+      loading: false,
+      errorClass: 'hidden',
+      errorMsg: ''
     };
 
     this.currentScrollTop = 0;  // to determine scroll up/down
@@ -28,7 +30,7 @@ class ImageViewer extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener('scroll', throttle(() => {this.handleOnScroll();}, 500, {leading: true}), false);
+    window.addEventListener('scroll', this.handleOnScroll);
   }
 
   componentWillMount() {
@@ -50,81 +52,121 @@ class ImageViewer extends Component {
   }
 
   fetchImages() {
-    FetchHandler.fetchImages('/data/imageData.json', this.startIndex, this.endIndex).then((imageData) => {
-      const imageArray = [];
+    this.setState({loading: true});
+    fetchImages('/data/imageData.json', this.startIndex, this.endIndex).then((imageData) => {
+      try {
+        const imageArray = [];
+        // const newArr = null;
+        // newArr = imageData.reduce( (prevImage = { }, image) => {
+          // console.log('prev', prevImage);
+          // console.log('next', image);
+        //   if(prevImage.assetId === image.assetId) {
+        //     return Object.assign({}, prevImage, image, {
+        //     url:`https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`,
+        //     deploymentTs: dateFormat(new Date(image.deploymentTs), "mm/dd/yyyy hh:mm")
+        //   })} else {
+        //     return image;
+        //   }
+        //  } );
         imageData.reduce((prevImage, image) => {
-          prevImage = prevImage || {};
-  
-          // combining the Converted Image and Deployment Target objects (assuming that both appear consecutively in the response)
-          if(prevImage.assetId === image.assetId) {
-            Object.assign(prevImage, image);
-            prevImage.url = `https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`;
-            const timestamp = new Date(image.deploymentTs);
-            prevImage.deploymentTs = dateFormat(timestamp, "mm/dd/yyyy hh:mm");
-            imageArray.push(prevImage);
-          } else {
-            prevImage = image;
-          }
+        prevImage = prevImage || {};
+
+        // combining the Converted Image and Deployment Target objects (assuming that both appear consecutively in the response)
+        if(prevImage.assetId === image.assetId) {
+          Object.assign(prevImage, image);
+          prevImage.url = `https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`;
+          const timestamp = new Date(image.deploymentTs);
+          prevImage.deploymentTs = dateFormat(timestamp, "mm/dd/yyyy hh:mm");
+          imageArray.push(prevImage);
+        } else {
+          prevImage = image;
+        }
           return prevImage;
         });
         this.setState({
-          loadedImages: imageArray
+          loadedImages: imageArray,
+          loading: false,
+          errorClass: 'hidden',
+          errorMsg: ''
         });
+        throw new Error();
+      } catch(error) {
+        // console.error('catch', error);
+        this.setState({ 
+          loading: false,
+          errorClass: '',
+          errorMsg, error
+        });
+         console.error('catch', error, this.state);
+      }
     }).catch((error) => {
-      //TODO: error handling
+      this.setState({ 
+        loading: false,
+        errorClass: '',
+        errorMsg: error
+      });
     });
   }
 
-  handleImageError() {
+  handleImageError(event) {
     //TODO: show default image if image does not load
   }
 
   handleOnScroll() {
-    this.prevScrollTop = this.currentScrollTop;
-    this.currentScrollTop =  window.scrollY;
-    if(this.currentScrollTop < this.prevScrollTop) {  // handling scroll up
-      if(window.scrollY < 500 && this.state.startIndex !== 0 && (this.state.loadedImages.length === this.threshold)) {
-        this.startIndex = (this.startIndex - this.imageFetchCount) < 0 ? 0 : (this.startIndex - this.imageFetchCount); 
-        this.endIndex = (this.endIndex - this.imageFetchCount) < 0 ? 0 : (this.endIndex - this.imageFetchCount); 
-        this.fetchImages();
-        console.log('up', this.startIndex, this.endIndex, this.state.loadedImages.length);
-      }
-    } else if(this.currentScrollTop > this.prevScrollTop) { // handling scroll down
-      if((window.innerHeight + window.scrollY) >= (document.getElementById('images-container').clientHeight - 500)) {
-        this.endIndex = this.endIndex + this.imageFetchCount;
-        if(!(this.state.loadedImages.length < this.threshold)) {
-          this.startIndex = this.startIndex + this.imageFetchCount;
+    if(!this.state.loading) {
+      this.prevScrollTop = this.currentScrollTop;
+      this.currentScrollTop =  window.scrollY;
+      if(this.currentScrollTop < this.prevScrollTop) {  // handling scroll up
+        if((window.scrollY < 700 || window.scrollY === 0)  && (this.state.startIndex !== 0 && (this.state.loadedImages.length === this.threshold))) {
+          this.startIndex = (this.startIndex - this.imageFetchCount) < 0 ? 0 : (this.startIndex - this.imageFetchCount); 
+          this.endIndex = (this.endIndex - this.imageFetchCount) < 0 ? 0 : (this.endIndex - this.imageFetchCount); 
+          this.fetchImages();
+          // console.log('up', this.startIndex, this.endIndex, this.state.loadedImages.length);
         }
-        this.fetchImages();
-        console.log('down', this.startIndex, this.endIndex, this.state.loadedImages.length);
+      } else if(this.currentScrollTop > this.prevScrollTop) { // handling scroll down
+        if((window.innerHeight + window.scrollY) >= (document.getElementById('images-container').clientHeight - 500)) {
+          this.endIndex = this.endIndex + this.imageFetchCount;
+          if(!(this.state.loadedImages.length < this.threshold)) {
+            this.startIndex = this.startIndex + this.imageFetchCount;
+          }
+          this.fetchImages();
+          // console.log('down', this.startIndex, this.endIndex, this.state.loadedImages.length);
+        }
       }
     }
   }
 
   render() {
     return (
-      <div className='image-viewer' id="images-container">
-        {this.state.loadedImages.map((image, index) => {
-          return <Image
-            key={image.assetId}
-            index={index}
-            url={image.url}
-            height={image.height}
-            width={image.width}
-            movieId={image.movieId}
-            deploymentTs={image.deploymentTs}
-            handleDragStart={(dragIndex)=> {
-              this.setState({dragIndex});
-            }}
-            handleDragOver={(event) => {
-              event.preventDefault();
-            }}
-            handleDrop={(dropIndex)=> {
-              this.setState({dropIndex});
-            }}
-            handleImageError={this.handleImageError}>
-          </Image>;
-        })}
+      <div className='page'>
+        <div id='error-container' className='error-container {this.state.errorClass}'>
+          <Error 
+            errorMessage={this.state.error}>
+          </Error>
+        </div>
+        <div id='images-container' className='image-viewer'>
+          {this.state.loadedImages.map((image, index) => {
+            return <Image
+              key={image.assetId}
+              index={index}
+              url={image.url}
+              height={image.height}
+              width={image.width}
+              movieId={image.movieId}
+              deploymentTs={image.deploymentTs}
+              handleDragStart={(dragIndex)=> {
+                this.setState({dragIndex});
+              }}
+              handleDragOver={(event) => {
+                event.preventDefault();
+              }}
+              handleDrop={(dropIndex)=> {
+                this.setState({dropIndex});
+              }}
+              handleImageError={this.handleImageError}>
+            </Image>;
+          })}
+        </div>
       </div>
     )
   }
