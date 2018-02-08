@@ -36,25 +36,3 @@ class Image extends Component {
     }
 }
 export default Image;
-
-/*
-image onerror - what happens if the page fails to load
-DONE drag-drop functionality needs to be in the parent
-DONEtry to have stateless components
-DONE popover component
-DONE popover control should also be with the parent
-DONE image rendering - 
-DONE - counter/limit
-DONE(infinite scroll) - load more link
-DONE - at a time there can be only x no of images/dom nodes on the page
-DONE as user moves down, remove the top nodes that are no longer visible to the user
-
-TODO: loading/spinner
-TODO: default image if image does not load
-TODO: provide alt text
-TODO: convert timestamp to a proper date
-TODO: Animate/make the image bigger on hover
-DONE TODO: create a helper for the fetch call that exports a function with params start index, end index and fetch each time
-TODO: show backgroud color before image loads
-TODO: use li or div for images?
-*/

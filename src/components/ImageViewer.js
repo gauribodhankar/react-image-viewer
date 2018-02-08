@@ -25,6 +25,8 @@ class ImageViewer extends Component {
     this.startIndex = 0;
     this.endIndex = this.startIndex + this.imageFetchCount;
   
+    this.isLastImageFetched = false;
+
     this.handleImageError = this.handleImageError.bind(this);
     this.handleOnScroll = this.handleOnScroll.bind(this);
   }
@@ -55,29 +57,33 @@ class ImageViewer extends Component {
     this.setState({loading: true});
     fetchImages('/data/imageData.json', this.startIndex, this.endIndex).then((imageData) => {
       try {
-        const imageArray = [];
-        imageData.reduce((prevImage, image) => {
-        prevImage = prevImage || {};
+        if(imageData.images) {
+          const imageArray = [];
+          imageData.images.reduce((prevImage, image) => {
+            prevImage = prevImage || {};
+    
+            // combining the Converted Image and Deployment Target objects (assuming that both appear consecutively in the response)
+            if(prevImage.assetId === image.assetId) {
+              Object.assign(prevImage, image);
+              
+              prevImage.url = `https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`;
+              prevImage.deploymentTs = dateFormat(new Date(image.deploymentTs), "mm/dd/yyyy hh:mm");
+              
+              imageArray.push(prevImage);
+            } else {
+              prevImage = image;
+            }
+              return prevImage;
+            });
+            this.isLastImageFetched = imageData.isLastImageFetched;
 
-        // combining the Converted Image and Deployment Target objects (assuming that both appear consecutively in the response)
-        if(prevImage.assetId === image.assetId) {
-          Object.assign(prevImage, image);
-          
-          prevImage.url = `https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`;
-          prevImage.deploymentTs = dateFormat(new Date(image.deploymentTs), "mm/dd/yyyy hh:mm");
-          
-          imageArray.push(prevImage);
-        } else {
-          prevImage = image;
+            this.setState({
+              loadedImages: imageArray,
+              loading: false,
+              errorClass: 'hidden',
+              errorMsg: ''
+            });
         }
-          return prevImage;
-        });
-        this.setState({
-          loadedImages: imageArray,
-          loading: false,
-          errorClass: 'hidden',
-          errorMsg: ''
-        });
         // throw new Error('test'); // TODO: getting an error here
       } catch(error) {
         this.setErrorState(error);
@@ -105,7 +111,8 @@ class ImageViewer extends Component {
       this.prevScrollTop = this.currentScrollTop;
       this.currentScrollTop =  window.scrollY;
       if(this.currentScrollTop < this.prevScrollTop) {  // handling scroll up
-        if((window.scrollY < 700 || window.scrollY === 0)  && (this.state.startIndex !== 0 && (this.state.loadedImages.length === this.threshold))) {
+        if((window.scrollY < 700 || window.scrollY === 0)  && (this.startIndex !== 0 && (this.state.loadedImages.length === this.threshold || this.isLastImageFetched))) {
+          console.log('iffff', this.startIndex, this.endIndex, this.state.loadedImages.length);
           this.startIndex = (this.startIndex - this.imageFetchCount) < 0 ? 0 : (this.startIndex - this.imageFetchCount); 
           this.endIndex = (this.endIndex - this.imageFetchCount) < 0 ? 0 : (this.endIndex - this.imageFetchCount); 
           this.fetchImages();
@@ -113,12 +120,15 @@ class ImageViewer extends Component {
         }
       } else if(this.currentScrollTop > this.prevScrollTop) { // handling scroll down
         if((window.innerHeight + window.scrollY) >= (document.getElementById('images-container').clientHeight - 500)) {
-          this.endIndex = this.endIndex + this.imageFetchCount;
-          if(!(this.state.loadedImages.length < this.threshold)) {
-            this.startIndex = this.startIndex + this.imageFetchCount;
+          console.log(this.isLastImageFetched);
+          if(!this.isLastImageFetched) {
+            if(!(this.state.loadedImages.length < this.threshold)) {
+              this.startIndex = this.startIndex + this.imageFetchCount;
+            }
+            this.endIndex = this.endIndex + this.imageFetchCount;
+            this.fetchImages();
+            // console.log('down', this.startIndex, this.endIndex, this.state.loadedImages.length);
           }
-          this.fetchImages();
-          // console.log('down', this.startIndex, this.endIndex, this.state.loadedImages.length);
         }
       }
     }
