@@ -4,6 +4,7 @@ import Error from './Error.js'
 import dateFormat from 'dateformat'
 import './../styles/ImageViewer.css'
 import { fetchImages } from './../helpers/fetchHandler.js'
+import { BeatLoader } from 'react-spinners'
 
 class ImageViewer extends Component {
   constructor() {
@@ -164,6 +165,12 @@ class ImageViewer extends Component {
               handleImageError={this.handleImageError}>
             </Image>;
           })}
+        </div>
+        <div className='loading'>
+            <BeatLoader
+              color={'gray'} 
+              loading={this.state.loading} 
+            />
         </div>
       </div>
     )

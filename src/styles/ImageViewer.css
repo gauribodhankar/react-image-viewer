@@ -1,8 +1,4 @@
 .image-viewer {
-    height: auto;
-    width: 100%;
-    min-height: 520px;
-    min-width: 420px;
     overflow-y: auto;
 }
 .image {
