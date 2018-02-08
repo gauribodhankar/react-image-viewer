@@ -56,27 +56,16 @@ class ImageViewer extends Component {
     fetchImages('/data/imageData.json', this.startIndex, this.endIndex).then((imageData) => {
       try {
         const imageArray = [];
-        // const newArr = null;
-        // newArr = imageData.reduce( (prevImage = { }, image) => {
-          // console.log('prev', prevImage);
-          // console.log('next', image);
-        //   if(prevImage.assetId === image.assetId) {
-        //     return Object.assign({}, prevImage, image, {
-        //     url:`https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`,
-        //     deploymentTs: dateFormat(new Date(image.deploymentTs), "mm/dd/yyyy hh:mm")
-        //   })} else {
-        //     return image;
-        //   }
-        //  } );
         imageData.reduce((prevImage, image) => {
         prevImage = prevImage || {};
 
         // combining the Converted Image and Deployment Target objects (assuming that both appear consecutively in the response)
         if(prevImage.assetId === image.assetId) {
           Object.assign(prevImage, image);
+          
           prevImage.url = `https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`;
-          const timestamp = new Date(image.deploymentTs);
-          prevImage.deploymentTs = dateFormat(timestamp, "mm/dd/yyyy hh:mm");
+          prevImage.deploymentTs = dateFormat(new Date(image.deploymentTs), "mm/dd/yyyy hh:mm");
+          
           imageArray.push(prevImage);
         } else {
           prevImage = image;
@@ -89,22 +78,21 @@ class ImageViewer extends Component {
           errorClass: 'hidden',
           errorMsg: ''
         });
-        throw new Error();
+        // throw new Error('test'); // TODO: getting an error here
       } catch(error) {
-        // console.error('catch', error);
-        this.setState({ 
-          loading: false,
-          errorClass: '',
-          errorMsg, error
-        });
-         console.error('catch', error, this.state);
+        this.setErrorState(error);
       }
     }).catch((error) => {
-      this.setState({ 
-        loading: false,
-        errorClass: '',
-        errorMsg: error
-      });
+     this.setErrorState(error);
+    });
+  }
+
+  setErrorState(error) {
+    const defaultErrorMsg = 'Something went wrong. Please try again.'
+    this.setState({ 
+      loading: false,
+      errorClass: '',
+      errorMsg: error || defaultErrorMsg
     });
   }
 
@@ -139,9 +127,9 @@ class ImageViewer extends Component {
   render() {
     return (
       <div className='page'>
-        <div id='error-container' className='error-container {this.state.errorClass}'>
+        <div id='error-container' className={`error-container ${this.state.errorClass}`}>
           <Error 
-            errorMessage={this.state.error}>
+            errorMessage={this.state.errorMsg}>
           </Error>
         </div>
         <div id='images-container' className='image-viewer'>

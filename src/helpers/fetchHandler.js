@@ -5,13 +5,15 @@
           ).then(response => {
             return response.json();
           }).then((imageData) => {
-            if(imageData && imageData.length > 0) {
-                resolve(imageData.slice(startIndex*2, endIndex*2));
+            const totalImages = imageData.length;
+            if(imageData && totalImages > 0) {
+                endIndex = totalImages < endIndex*2 ? totalImages : endIndex*2
+                resolve(imageData.slice(startIndex*2, endIndex));
             } else {
-                reject("No images available. Please try again.");
+                reject('No images available. Please try again.');
             }         
           }).catch((error) => {
-            reject("Something went wrong. Please try again. "+ error.toString());
+            reject(error && error.toString()); // TODO: do we show technical errors to users?
           });
     });
 
