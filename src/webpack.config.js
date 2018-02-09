@@ -1,5 +1,6 @@
-var webpack = require('webpack')
-var path = require('path')
+const webpack = require('webpack')
+const path = require('path')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 module.exports = {
   entry: path.resolve(__dirname, 'app'),
   output: {
@@ -15,5 +16,12 @@ module.exports = {
       {test: /\.js$/, exclude: /node_modules/, loaders: ['babel-loader']},
       {test: /(\.css)$/, loaders: ['style-loader', 'css-loader']}
     ]
-  }
+  },
+  plugins: [
+    new UglifyJsPlugin({
+      test: /\.js($|\?)/i,
+      exclude: /\/node_modules/,
+      parallel: true
+    })
+  ],
 }

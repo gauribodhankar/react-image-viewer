@@ -22,7 +22,8 @@ class Image extends Component {
                     className="movie-image"
                     id={this.props.assetId}
                     index={this.props.index} 
-                    src={this.props.url} 
+                    src={this.props.url}
+                    alt={this.props.assetId}
                     onError={this.props.handleImageError} />
 
                 <div className="overlay"></div>
