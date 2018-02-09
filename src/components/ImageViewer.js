@@ -37,7 +37,7 @@ class ImageViewer extends Component {
   }
 
   componentWillMount() {
-    this.fetchImages();
+    this.fetchImages().then(() => {});
   }
 
   componentWillUpdate(nextProps, nextState) {
@@ -55,42 +55,45 @@ class ImageViewer extends Component {
   }
 
   fetchImages() {
-    this.setState({ loading: true });
-    fetchImages('/data/imageData.json', this.startIndex, this.endIndex).then((imageData) => {
-      try {
-        if (imageData.images) {
-          const imageArray = [];
-          imageData.images.reduce((prevImage, image) => {
-            prevImage = prevImage || {};
+    return new Promise((resolve, reject) => {
+      this.setState({ loading: true });
+      fetchImages('/data/imageData.json', this.startIndex, this.endIndex).then((imageData) => {
+        try {
+          if (imageData.images) {
+            const imageArray = [];
+            imageData.images.reduce((prevImage, image) => {
+              prevImage = prevImage || {};
 
-            // combining the Converted Image and Deployment Target objects (assuming that both appear consecutively in the response)
-            if (prevImage.assetId === image.assetId) {
-              Object.assign(prevImage, image);
+              // combining the Converted Image and Deployment Target objects (assuming that both appear consecutively in the response)
+              if (prevImage.assetId === image.assetId) {
+                Object.assign(prevImage, image);
 
-              prevImage.url = `https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`;
-              prevImage.deploymentTs = dateFormat(new Date(image.deploymentTs), "mm/dd/yyyy hh:mm");
+                prevImage.url = `https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`;
+                prevImage.deploymentTs = dateFormat(new Date(image.deploymentTs), "mm/dd/yyyy hh:mm");
 
-              imageArray.push(prevImage);
-            } else {
-              prevImage = image;
-            }
-            return prevImage;
-          });
-          this.isLastImageFetched = imageData.isLastImageFetched;
+                imageArray.push(prevImage);
+              } else {
+                prevImage = image;
+              }
+              return prevImage;
+            });
+            this.isLastImageFetched = imageData.isLastImageFetched;
 
-          this.setState({
-            loadedImages: imageArray,
-            loading: false,
-            errorClass: 'hidden',
-            errorMsg: ''
-          });
+            this.setState({
+              loadedImages: imageArray,
+              loading: false,
+              errorClass: 'hidden',
+              errorMsg: ''
+            });
+            resolve();
+          }
+          // throw new Error('test'); // TODO: getting an error here
+        } catch (error) {
+          this.setErrorState(error);
         }
-        // throw new Error('test'); // TODO: getting an error here
-      } catch (error) {
+      }).catch((error) => {
         this.setErrorState(error);
-      }
-    }).catch((error) => {
-      this.setErrorState(error);
+      });
     });
   }
 
@@ -111,24 +114,24 @@ class ImageViewer extends Component {
     if (!this.state.loading) {
       this.prevScrollTop = this.currentScrollTop;
       this.currentScrollTop = window.scrollY;
-      // console.log('loadedImages', this.state.loadedImages.length);
-      if (this.currentScrollTop < this.prevScrollTop) {  // handling scroll up
+      if (this.currentScrollTop <= this.prevScrollTop) {  // handling scroll up
         if ((window.scrollY < 1000 || window.scrollY === 0) && (this.startIndex !== 0 && (this.state.loadedImages.length === this.threshold || this.isLastImageFetched))) {
           this.startIndex = (this.startIndex - this.imageFetchCount) < 0 ? 0 : (this.startIndex - this.imageFetchCount);
           this.endIndex = (this.endIndex - this.imageFetchCount);
-          this.fetchImages();
-          // console.log('up', this.startIndex, this.endIndex, this.state.loadedImages.length);
+          this.fetchImages().then(() => {
+            if(window.scrollY === 0 && this.startIndex !== 0) {
+              document.scrollingElement.scrollTo(0, 100);
+            }
+          });
         }
       } else if (this.currentScrollTop > this.prevScrollTop) { // handling scroll down
         if ((window.innerHeight + window.scrollY) >= (document.getElementById('images-container').clientHeight - 1000)) {
-          console.log('y ',window.scrollY);
           if (!this.isLastImageFetched) {
             if (!(this.state.loadedImages.length < this.threshold)) {
               this.startIndex = this.startIndex + this.imageFetchCount;
             }
             this.endIndex = this.endIndex + this.imageFetchCount;
-            this.fetchImages();
-            // console.log('down', this.startIndex, this.endIndex, this.state.loadedImages.length);
+            this.fetchImages().then(() => {});
           }
         }
       }
