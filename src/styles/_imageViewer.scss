@@ -1,7 +1,18 @@
 .image-viewer-component {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
     .image-viewer {
         overflow-y: auto;
+    }
+    .image-viewer-ul {
+        list-style: none;
+        display: flex;
+        justify-content: center;
+        flex-flow: row wrap;
+        padding: 0;
     }
     .image {
         position: relative;
@@ -62,5 +73,9 @@
     }
     .hidden {
         display: none;
+    }
+    .loading {
+        display: flex;
+        justify-content: center;
     }
 }

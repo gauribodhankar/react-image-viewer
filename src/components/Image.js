@@ -1,7 +1,7 @@
 import React from 'react'
 
 const Image = ({ index, assetId, url, movieId, height, width, deploymentTs, handleDragStart, handleDragOver, handleDrop, handleImageError }) => (
-    <div
+    <li
         className="image"
         draggable="true"
         onDragStart={() => {
@@ -25,7 +25,7 @@ const Image = ({ index, assetId, url, movieId, height, width, deploymentTs, hand
             <span className="image-details-item">{height} X {width}</span>
             <span className="image-details-item">{deploymentTs}</span>
         </div>
-    </div>
+    </li>
 )
 
 export default Image;

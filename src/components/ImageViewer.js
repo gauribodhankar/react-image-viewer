@@ -39,7 +39,7 @@ class ImageViewer extends Component {
   componentWillMount() {
     this.fetchImages().then(() => {});
   }
-
+ 
   componentWillUpdate(nextProps, nextState) {
     // checking for valid drag-drop operation to reorder
     if ((nextState.dragIndex !== null && nextState.dropIndex !== null) && nextState.dragIndex !== nextState.dropIndex) {
@@ -47,6 +47,7 @@ class ImageViewer extends Component {
       reorderedImages[nextState.dragIndex] = this.state.loadedImages[nextState.dropIndex];
       reorderedImages[nextState.dropIndex] = this.state.loadedImages[nextState.dragIndex];
       this.setState({ loadedImages: reorderedImages, dragIndex: null, dropIndex: null });
+      // Note: the change in the order of images could be saved to the backend here
     }
   }
 
@@ -147,27 +148,29 @@ class ImageViewer extends Component {
           </Error>
         </div>
         <div id='images-container' className='image-viewer'>
-          {this.state.loadedImages.map((image, index) => {
-            return <Image
-              key={image.assetId}
-              index={index}
-              url={image.url}
-              height={image.height}
-              width={image.width}
-              movieId={image.movieId}
-              deploymentTs={image.deploymentTs}
-              handleDragStart={(dragIndex) => {
-                this.setState({ dragIndex });
-              }}
-              handleDragOver={(event) => {
-                event.preventDefault();
-              }}
-              handleDrop={(dropIndex) => {
-                this.setState({ dropIndex });
-              }}
-              handleImageError={this.handleImageError}>
-            </Image>;
-          })}
+          <ul className='image-viewer-ul'>
+            {this.state.loadedImages.map((image, index) => {
+              return <Image
+                key={image.assetId}
+                index={index}
+                url={image.url}
+                height={image.height}
+                width={image.width}
+                movieId={image.movieId}
+                deploymentTs={image.deploymentTs}
+                handleDragStart={(dragIndex) => {
+                  this.setState({ dragIndex });
+                }}
+                handleDragOver={(event) => {
+                  event.preventDefault();
+                }}
+                handleDrop={(dropIndex) => {
+                  this.setState({ dropIndex });
+                }}
+                handleImageError={this.handleImageError}>
+              </Image>;
+            })}
+          </ul>
         </div>
         <div className='loading'>
           <BeatLoader
