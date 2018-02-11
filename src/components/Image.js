@@ -1,39 +1,31 @@
-import React, { Component } from 'react'
+import React from 'react'
 
-class Image extends Component {
+const Image = ({ index, assetId, url, movieId, height, width, deploymentTs, handleDragStart, handleDragOver, handleDrop, handleImageError }) => (
+    <div
+        className="image"
+        draggable="true"
+        onDragStart={() => {
+            handleDragStart(index);
+        }}
+        onDragOver={handleDragOver}
+        onDrop={() => {
+            handleDrop(index);
+        }}>
+        <img
+            className="movie-image"
+            id={assetId}
+            index={index}
+            src={url}
+            alt={assetId}
+            onError={handleImageError} />
 
-    constructor(props) { // TODO: do we need the constructor
-        super(props);       
-    } 
+        <div className="overlay"></div>
+        <div className="image-details">
+            <span className="image-details-item">ID: {movieId}</span>
+            <span className="image-details-item">{height} X {width}</span>
+            <span className="image-details-item">{deploymentTs}</span>
+        </div>
+    </div>
+)
 
-    render() {
-        return (
-            <div 
-                className="image"
-                draggable="true"
-                onDragStart={() => {
-                    this.props.handleDragStart(this.props.index);
-                }}
-                onDragOver={this.props.handleDragOver}
-                onDrop={() => {
-                    this.props.handleDrop(this.props.index);
-                }}>
-                <img 
-                    className="movie-image"
-                    id={this.props.assetId}
-                    index={this.props.index} 
-                    src={this.props.url}
-                    alt={this.props.assetId}
-                    onError={this.props.handleImageError} />
-
-                <div className="overlay"></div>
-                <div className="image-details">
-                    <span className="image-details-item">ID: {this.props.movieId}</span>
-                    <span className="image-details-item">{this.props.height} X {this.props.width}</span>
-                    <span className="image-details-item">{this.props.deploymentTs}</span>
-                </div>
-            </div>
-        )
-    }
-}
 export default Image;
