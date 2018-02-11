@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Image from './Image.js'
 import Error from './Error.js'
 import dateFormat from 'dateformat'
-import './../styles/ImageViewer.css'
+import './../styles/_imageViewer.scss'
 import { fetchImages } from './../helpers/fetchHandler.js'
 import { BeatLoader } from 'react-spinners'
 
@@ -140,7 +140,7 @@ class ImageViewer extends Component {
 
   render() {
     return (
-      <div className='page'>
+      <div className='image-viewer-component'>
         <div id='error-container' className={`error-container ${this.state.errorClass}`}>
           <Error
             errorMessage={this.state.errorMsg}>
