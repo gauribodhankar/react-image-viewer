@@ -26,6 +26,8 @@ class ImageViewer extends Component {
     this.imageFetchCount = 30;  // number of images to fetch on each call
     this.startIndex = 0;
     this.endIndex = this.startIndex + this.imageFetchCount;
+    this.fetchStartIndex = this.startIndex;
+    this.fetchEndIndex = this.endIndex;
 
     this.isLastImageFetched = false;  // to check if all images have been fetched
 
@@ -34,11 +36,11 @@ class ImageViewer extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener('scroll', throttle(this.handleOnScroll, 300, {leading: true}));
+    window.addEventListener('scroll', throttle(this.handleOnScroll, 200, {leading: true}));
   }
 
   componentWillMount() {
-    this.fetchImages().then(() => {});
+    this.fetchImages().then((images) => { this.updateState(images) });
   }
  
   componentWillUpdate(nextProps, nextState) {
@@ -48,7 +50,7 @@ class ImageViewer extends Component {
       reorderedImages[nextState.dragIndex] = this.state.loadedImages[nextState.dropIndex];
       reorderedImages[nextState.dropIndex] = this.state.loadedImages[nextState.dragIndex];
       this.setState({ loadedImages: reorderedImages, dragIndex: null, dropIndex: null });
-      // Note: the change in the order of images could be saved to the backend here
+      // Note: the change in the order of images could be saved to the backend here by calling another function doing the job
     }
   }
 
@@ -59,7 +61,7 @@ class ImageViewer extends Component {
   fetchImages() {
     return new Promise((resolve, reject) => {
       this.setState({ loading: true });
-      fetchImages('/data/imageData.json', this.startIndex, this.endIndex).then((imageData) => {
+      fetchImages('/data/imageData.json', this.fetchStartIndex, this.fetchEndIndex).then((imageData) => {
         try {
           if (imageData.images) {
             const imageArray = [];
@@ -80,22 +82,24 @@ class ImageViewer extends Component {
               return prevImage;
             });
             this.isLastImageFetched = imageData.isLastImageFetched;
-
-            this.setState({
-              loadedImages: imageArray,
-              loading: false,
-              errorClass: 'hidden',
-              errorMsg: ''
-            });
-            resolve();
+            resolve(imageArray);
           }
-          // throw new Error('test'); // TODO: getting an error here
         } catch (error) {
           this.setErrorState(error);
         }
       }).catch((error) => {
         this.setErrorState(error);
       });
+    });
+  }
+
+  updateState(images) {
+    console.log(images.length);
+    this.setState({
+      loadedImages: images,
+      loading: false,
+      errorClass: 'hidden',
+      errorMsg: ''
     });
   }
 
@@ -116,7 +120,13 @@ class ImageViewer extends Component {
     if ((window.scrollY < 1000 || window.scrollY === 0) && (this.startIndex !== 0 && (this.state.loadedImages.length === this.threshold || this.isLastImageFetched))) {
       this.startIndex = (this.startIndex - this.imageFetchCount) < 0 ? 0 : (this.startIndex - this.imageFetchCount);
       this.endIndex = (this.endIndex - this.imageFetchCount);
-      this.fetchImages().then(() => {
+      this.fetchStartIndex = this.startIndex;
+      this.fetchEndIndex = this.fetchStartIndex + this.imageFetchCount;
+      this.fetchImages().then((images) => {
+        let updatedImages = [];
+        updatedImages = images.concat(this.state.loadedImages.slice(0, this.threshold - this.imageFetchCount));
+        this.updateState(updatedImages);
+
         if(window.scrollY === 0 && this.startIndex !== 0) {
           document.scrollingElement.scrollTo(0, 100);
         }
@@ -126,11 +136,21 @@ class ImageViewer extends Component {
   scrollDown() {
     if ((window.innerHeight + window.scrollY) >= (document.getElementById('images-container').clientHeight - 1000)) {
       if (!this.isLastImageFetched) {
-        if (!(this.state.loadedImages.length < this.threshold)) {
+        if (this.state.loadedImages.length === this.threshold) {
           this.startIndex = this.startIndex + this.imageFetchCount;
-        }
+        }        
+        this.fetchStartIndex = this.fetchStartIndex != 0 ? this.fetchStartIndex + this.imageFetchCount : this.startIndex + this.imageFetchCount;
         this.endIndex = this.endIndex + this.imageFetchCount;
-        this.fetchImages().then(() => {});
+        this.fetchEndIndex = this.endIndex;
+        this.fetchImages().then((images) => {
+          let updatedImages = [];
+          if (this.state.loadedImages.length === this.threshold) {
+            updatedImages = this.state.loadedImages.slice(this.imageFetchCount).concat(images);
+          } else {
+            updatedImages = this.state.loadedImages.concat(images);
+          }
+          this.updateState(updatedImages);
+        });
       }
     }
   }
