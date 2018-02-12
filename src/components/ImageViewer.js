@@ -36,7 +36,7 @@ class ImageViewer extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener('scroll', throttle(this.handleOnScroll, 200, {leading: true}));
+    window.addEventListener('scroll', throttle(this.handleOnScroll, 100, {leading: true}));
   }
 
   componentWillMount() {
