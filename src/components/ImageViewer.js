@@ -118,10 +118,10 @@ class ImageViewer extends Component {
 
   scrollUp() {
     if ((window.scrollY < 1000 || window.scrollY === 0) && (this.startIndex !== 0 && (this.state.loadedImages.length === this.threshold || this.isLastImageFetched))) {
+      this.fetchEndIndex = this.startIndex;
       this.startIndex = (this.startIndex - this.imageFetchCount) < 0 ? 0 : (this.startIndex - this.imageFetchCount);
       this.endIndex = (this.endIndex - this.imageFetchCount);
       this.fetchStartIndex = this.startIndex;
-      this.fetchEndIndex = this.fetchStartIndex + this.imageFetchCount;
       this.fetchImages().then((images) => {
         let updatedImages = [];
         updatedImages = images.concat(this.state.loadedImages.slice(0, this.threshold - this.imageFetchCount));
@@ -138,8 +138,8 @@ class ImageViewer extends Component {
       if (!this.isLastImageFetched) {
         if (this.state.loadedImages.length === this.threshold) {
           this.startIndex = this.startIndex + this.imageFetchCount;
-        }        
-        this.fetchStartIndex = this.fetchStartIndex != 0 ? this.fetchStartIndex + this.imageFetchCount : this.startIndex + this.imageFetchCount;
+        }
+        this.fetchStartIndex = this.endIndex;
         this.endIndex = this.endIndex + this.imageFetchCount;
         this.fetchEndIndex = this.endIndex;
         this.fetchImages().then((images) => {
