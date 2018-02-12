@@ -94,7 +94,6 @@ class ImageViewer extends Component {
   }
 
   updateState(images) {
-    console.log(images.length);
     this.setState({
       loadedImages: images,
       loading: false,

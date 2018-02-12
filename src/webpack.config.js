@@ -9,7 +9,8 @@ module.exports = {
     filename: 'bundle.js'
   },
   devServer: {
-    contentBase: path.resolve(__dirname, './')
+    contentBase: path.resolve(__dirname, './'),
+    open: true
   },
   module: {
     loaders: [
