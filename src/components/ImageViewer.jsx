@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import Image from './Image.js'
-import Error from './Error.js'
+import Image from './Image.jsx'
+import Error from './Error.jsx'
 import dateFormat from 'dateformat'
 import './../styles/imageViewer.scss'
 import { fetchImages } from './../helpers/fetchHandler.js'

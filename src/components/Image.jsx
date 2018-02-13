@@ -32,6 +32,7 @@ class Image extends Component {
                     this.setState({ url: this.defaultImageUrl })}
                  } />
 
+            {/* on hover */}
             <div className="overlay"></div>
             <div className="image-details">
                 <span className="image-details-item">ID: {this.props.movieId}</span>
