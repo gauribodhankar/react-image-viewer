@@ -115,7 +115,7 @@ class ImageViewer extends Component {
     this.endIndex = newEndIndex;
   }
 
-  scrollUp({ window, container, totalLoadedImages, loadedImages, startIndex, endIndex, threshold, imageFetchCount, isLastImageFetched, updateStartIndex, updateEndIndex, updateState }) {
+  scrollUp({ window, totalLoadedImages, loadedImages, startIndex, endIndex, threshold, imageFetchCount, isLastImageFetched, updateStartIndex, updateEndIndex, updateState }) {
     if ((window.scrollY < 1000 || window.scrollY === 0) && (startIndex !== 0 && (totalLoadedImages === threshold || isLastImageFetched))) {
       const newStartIndex = (startIndex - imageFetchCount) < 0 ? 0 : (startIndex - imageFetchCount);
       updateStartIndex(newStartIndex);
