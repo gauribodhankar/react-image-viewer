@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import propTypes from 'prop-types'
 import Image from './Image.jsx'
 import Error from './Error.jsx'
 import dateFormat from 'dateformat'
@@ -8,6 +9,10 @@ import { BeatLoader } from 'react-spinners'
 import throttle from 'lodash.throttle'
 
 class ImageViewer extends Component {
+  static defaultProps = {
+    threshold: 180,
+    imageFetchCount: 90
+  }
   constructor(props) {
     super(props);
 
@@ -26,7 +31,7 @@ class ImageViewer extends Component {
 
     // first & last loaded image's index in the main image array( returned by the API ) in the current fetch call
     this.startIndex = 0;
-    this.endIndex = this.startIndex + props.imageFetchCount;
+    this.endIndex = this.startIndex + parseInt(props.imageFetchCount);
 
     this.handleOnScroll = this.handleOnScroll.bind(this);
     this.updateStartIndex = this.updateStartIndex.bind(this);
@@ -171,8 +176,8 @@ class ImageViewer extends Component {
         container: document.getElementById('images-container'),
         totalLoadedImages: this.state.loadedImages && this.state.loadedImages.length,
         loadedImages: this.state.loadedImages,
-        threshold: this.props.threshold,
-        imageFetchCount: this.props.imageFetchCount,
+        threshold: parseInt(this.props.threshold),
+        imageFetchCount: parseInt(this.props.imageFetchCount),
         isLastImageFetched: this.isLastImageFetched,
         startIndex: this.startIndex,
         endIndex: this.endIndex,
@@ -230,5 +235,12 @@ class ImageViewer extends Component {
       </div>
     )
   }
+}
+/* Checking for prop types
+Note: Validation of prop values has not yet been included
+*/
+ImageViewer.propTypes = {
+  threshold: propTypes.number,
+  imageFetchCount: propTypes.number
 }
 export default ImageViewer

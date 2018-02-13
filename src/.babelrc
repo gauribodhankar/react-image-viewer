@@ -3,6 +3,7 @@
     "react"
   ],
   "plugins": [
-    "emotion"
+    "emotion",
+    "transform-class-properties"
   ]
 }
