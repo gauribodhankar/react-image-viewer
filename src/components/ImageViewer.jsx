@@ -23,9 +23,9 @@ class ImageViewer extends Component {
     this.currentScrollTop = 0;  // to determine scroll up/down
     this.prevScrollTop = 0;     // to determine scroll up/down
     this.isLastImageFetched = false;  // to check if all images have been fetched
-    
+
     // first & last loaded image's index in the main image array( returned by the API ) in the current fetch call
-    this.startIndex = 0;        
+    this.startIndex = 0;
     this.endIndex = this.startIndex + props.imageFetchCount;
 
     this.handleOnScroll = this.handleOnScroll.bind(this);
@@ -61,27 +61,26 @@ class ImageViewer extends Component {
   getImageData(fetchStartIndex, fetchEndIndex) {
     return new Promise((resolve, reject) => {
       this.setState({ loading: true });
-      fetchImages('/data/imageData.json', fetchStartIndex, fetchEndIndex).then((imageData) => {
-        if (imageData.images) {
+      fetchImages('/data/imageData.json', fetchStartIndex, fetchEndIndex).then(({ images, isLastImageFetched }) => {
+        if (images) {
           const imageArray = [];
-          imageData.images.reduce((prevImage, image) => {
-            prevImage = prevImage || {};
+          for (let index = 0, top = images.length; index < top; index = index + 2) {
+            const prevImage = images[index],
+              nextImage = images[index + 1];
 
             // combining the Converted Image and Deployment Target objects (assuming that both appear consecutively in the response)
-            if (prevImage.assetId === image.assetId) {
-              Object.assign(prevImage, image);
-
-              prevImage.url = `https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`;
-              prevImage.deploymentTs = dateFormat(new Date(image.deploymentTs), "mm/dd/yyyy hh:mm");
-
-              imageArray.push(prevImage); // save the updated image object
-            } else {
-              prevImage = image;
+            if (prevImage.assetId === nextImage.assetId) {
+              imageArray.push({
+                assetId: prevImage.assetId,
+                movieId: prevImage.movieId,
+                url: `https://secure.netflix.com/us/boxshots/${nextImage.dir}/${prevImage.filename}`,
+                width: prevImage.width,
+                height: prevImage.height,
+                deploymentTs: dateFormat(new Date(nextImage.deploymentTs), "mm/dd/yyyy hh:mm")
+              });
             }
-            return prevImage;
-          });
-
-          this.isLastImageFetched = imageData.isLastImageFetched;
+          }
+          this.isLastImageFetched = isLastImageFetched;
           resolve(imageArray);
         }
       }).catch((error) => {

@@ -5,7 +5,7 @@ export const fetchImages = (url, startIndex, endIndex) => new Promise((resolve, 
         return response.json();
     }).then((imageData) => {
         const totalImages = imageData.length;
-        if (imageData && totalImages > 0) {
+        if (imageData && totalImages > 0 && endIndex > 0 && startIndex >= 0) {
             const isLastImageFetched = totalImages < endIndex * 2;
             endIndex = isLastImageFetched ? totalImages : endIndex * 2; // adjusting the end index if at end of image array
             resolve({
