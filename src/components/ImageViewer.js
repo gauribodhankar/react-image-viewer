@@ -31,7 +31,6 @@ class ImageViewer extends Component {
 
     this.isLastImageFetched = false;  // to check if all images have been fetched
 
-    this.handleImageError = this.handleImageError.bind(this);
     this.handleOnScroll = this.handleOnScroll.bind(this);
   }
 
@@ -109,10 +108,6 @@ class ImageViewer extends Component {
       errorClass: '',
       errorMsg: error || defaultErrorMsg
     });
-  }
-
-  handleImageError(event) {
-    //TODO: show default image if image does not load
   }
 
   scrollUp() {
@@ -193,8 +188,7 @@ class ImageViewer extends Component {
                 }}
                 handleDrop={(dropIndex) => {
                   this.setState({ dropIndex });
-                }}
-                handleImageError={this.handleImageError}>
+                }}>
               </Image>;
             })}
           </ul>
