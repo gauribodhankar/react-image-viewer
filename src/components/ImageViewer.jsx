@@ -8,8 +8,9 @@ import { BeatLoader } from 'react-spinners'
 import throttle from 'lodash.throttle'
 
 class ImageViewer extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+
     this.state = {
       loadedImages: [],
       dragIndex: null,  // index of the image being dragged
@@ -21,33 +22,33 @@ class ImageViewer extends Component {
 
     this.currentScrollTop = 0;  // to determine scroll up/down
     this.prevScrollTop = 0;     // to determine scroll up/down
-
-    this.threshold = 90;  // maximum number of images that can be loaded on the page at a given time
-    this.imageFetchCount = 30;  // number of images to fetch on each call
-    this.startIndex = 0;
-    this.endIndex = this.startIndex + this.imageFetchCount;
-    this.fetchStartIndex = this.startIndex;
-    this.fetchEndIndex = this.endIndex;
-
     this.isLastImageFetched = false;  // to check if all images have been fetched
+    
+    // first & last loaded image's index in the main image array( returned by the API ) in the current fetch call
+    this.startIndex = 0;        
+    this.endIndex = this.startIndex + props.imageFetchCount;
 
     this.handleOnScroll = this.handleOnScroll.bind(this);
+    this.updateStartIndex = this.updateStartIndex.bind(this);
+    this.updateEndIndex = this.updateEndIndex.bind(this);
+    this.updateState = this.updateState.bind(this);
   }
 
   componentDidMount() {
-    window.addEventListener('scroll', throttle(this.handleOnScroll, 100, {leading: true}));
+    window.addEventListener('scroll', throttle(this.handleOnScroll, 100, { leading: true }));
   }
 
   componentWillMount() {
-    this.fetchImages().then((images) => { this.updateState(images) });
+    this.getImageData(this.startIndex, this.endIndex).then((images) => { this.updateState(images) });
   }
- 
+
   componentWillUpdate(nextProps, nextState) {
     // checking for valid drag-drop operation to reorder
     if ((nextState.dragIndex !== null && nextState.dropIndex !== null) && nextState.dragIndex !== nextState.dropIndex) {
       const reorderedImages = Object.assign([], this.state.loadedImages);
       reorderedImages[nextState.dragIndex] = this.state.loadedImages[nextState.dropIndex];
       reorderedImages[nextState.dropIndex] = this.state.loadedImages[nextState.dragIndex];
+
       this.setState({ loadedImages: reorderedImages, dragIndex: null, dropIndex: null });
       // Note: the change in the order of images could be saved to the backend here by calling another function doing the job
     }
@@ -57,34 +58,31 @@ class ImageViewer extends Component {
     window.removeEventListener('scroll', this.handleOnScroll, false);
   }
 
-  fetchImages() {
+  getImageData(fetchStartIndex, fetchEndIndex) {
     return new Promise((resolve, reject) => {
       this.setState({ loading: true });
-      fetchImages('/data/imageData.json', this.fetchStartIndex, this.fetchEndIndex).then((imageData) => {
-        try {
-          if (imageData.images) {
-            const imageArray = [];
-            imageData.images.reduce((prevImage, image) => {
-              prevImage = prevImage || {};
+      fetchImages('/data/imageData.json', fetchStartIndex, fetchEndIndex).then((imageData) => {
+        if (imageData.images) {
+          const imageArray = [];
+          imageData.images.reduce((prevImage, image) => {
+            prevImage = prevImage || {};
 
-              // combining the Converted Image and Deployment Target objects (assuming that both appear consecutively in the response)
-              if (prevImage.assetId === image.assetId) {
-                Object.assign(prevImage, image);
+            // combining the Converted Image and Deployment Target objects (assuming that both appear consecutively in the response)
+            if (prevImage.assetId === image.assetId) {
+              Object.assign(prevImage, image);
 
-                prevImage.url = `https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`;
-                prevImage.deploymentTs = dateFormat(new Date(image.deploymentTs), "mm/dd/yyyy hh:mm");
+              prevImage.url = `https://secure.netflix.com/us/boxshots/${prevImage.dir}/${prevImage.filename}`;
+              prevImage.deploymentTs = dateFormat(new Date(image.deploymentTs), "mm/dd/yyyy hh:mm");
 
-                imageArray.push(prevImage);
-              } else {
-                prevImage = image;
-              }
-              return prevImage;
-            });
-            this.isLastImageFetched = imageData.isLastImageFetched;
-            resolve(imageArray);
-          }
-        } catch (error) {
-          this.setErrorState(error);
+              imageArray.push(prevImage); // save the updated image object
+            } else {
+              prevImage = image;
+            }
+            return prevImage;
+          });
+
+          this.isLastImageFetched = imageData.isLastImageFetched;
+          resolve(imageArray);
         }
       }).catch((error) => {
         this.setErrorState(error);
@@ -110,40 +108,55 @@ class ImageViewer extends Component {
     });
   }
 
-  scrollUp() {
-    if ((window.scrollY < 1000 || window.scrollY === 0) && (this.startIndex !== 0 && (this.state.loadedImages.length === this.threshold || this.isLastImageFetched))) {
-      this.fetchEndIndex = this.startIndex;
-      this.startIndex = (this.startIndex - this.imageFetchCount) < 0 ? 0 : (this.startIndex - this.imageFetchCount);
-      this.endIndex = (this.endIndex - this.imageFetchCount);
-      this.fetchStartIndex = this.startIndex;
-      this.fetchImages().then((images) => {
-        let updatedImages = [];
-        updatedImages = images.concat(this.state.loadedImages.slice(0, this.threshold - this.imageFetchCount));
-        this.updateState(updatedImages);
+  updateStartIndex(newStartIndex) {
+    this.startIndex = newStartIndex;
+  }
 
-        if(window.scrollY === 0 && this.startIndex !== 0) {
+  updateEndIndex(newEndIndex) {
+    this.endIndex = newEndIndex;
+  }
+
+  scrollUp({ window, container, totalLoadedImages, loadedImages, startIndex, endIndex, threshold, imageFetchCount, isLastImageFetched, updateStartIndex, updateEndIndex, updateState }) {
+    if ((window.scrollY < 1000 || window.scrollY === 0) && (startIndex !== 0 && (totalLoadedImages === threshold || isLastImageFetched))) {
+      const newStartIndex = (startIndex - imageFetchCount) < 0 ? 0 : (startIndex - imageFetchCount);
+      updateStartIndex(newStartIndex);
+      updateEndIndex(endIndex - imageFetchCount);
+
+      this.getImageData(newStartIndex, startIndex).then((images) => {
+        let updatedImages = [];
+        // removing from the end a certain number(imageFetchCount) of images from the loaded images to accomodate the additioanl images fetched on scroll up
+        // appending new images in front of the already loaded images
+        updatedImages = images.concat(loadedImages.slice(0, threshold - imageFetchCount));
+        // updating the component state with the updated image array
+        updateState(updatedImages);
+
+        if (window.scrollY === 0 && newStartIndex !== 0) {
           document.scrollingElement.scrollTo(0, 100);
         }
       });
     }
   }
-  scrollDown() {
-    if ((window.innerHeight + window.scrollY) >= (document.getElementById('images-container').clientHeight - 1000)) {
-      if (!this.isLastImageFetched) {
-        if (this.state.loadedImages.length === this.threshold) {
-          this.startIndex = this.startIndex + this.imageFetchCount;
+
+  scrollDown({ window, container, totalLoadedImages, loadedImages, startIndex, endIndex, threshold, imageFetchCount, isLastImageFetched, updateStartIndex, updateEndIndex, updateState }) {
+    if ((window.innerHeight + window.scrollY) >= (container.clientHeight - 1000)) {
+      if (!isLastImageFetched) {
+        if (totalLoadedImages === threshold) {
+          updateStartIndex(startIndex + imageFetchCount);
         }
-        this.fetchStartIndex = this.endIndex;
-        this.endIndex = this.endIndex + this.imageFetchCount;
-        this.fetchEndIndex = this.endIndex;
-        this.fetchImages().then((images) => {
+        updateEndIndex(endIndex + imageFetchCount);
+
+        this.getImageData(endIndex, endIndex + imageFetchCount).then((images) => {
           let updatedImages = [];
-          if (this.state.loadedImages.length === this.threshold) {
-            updatedImages = this.state.loadedImages.slice(this.imageFetchCount).concat(images);
+          if (totalLoadedImages === threshold) {
+            // removing from the start a certain number(imageFetchCount) of images from the loaded images to accomodate the additioanl images fetched on scroll down
+            // appending new images at the end of the loaded images
+            updatedImages = loadedImages.slice(imageFetchCount).concat(images);
           } else {
-            updatedImages = this.state.loadedImages.concat(images);
+            // only appending new images at the end without removing any, as the threshold is not reached
+            updatedImages = loadedImages.concat(images);
           }
-          this.updateState(updatedImages);
+          // updating the component state with the updated image array
+          updateState(updatedImages);
         });
       }
     }
@@ -153,10 +166,26 @@ class ImageViewer extends Component {
     if (!this.state.loading) {
       this.prevScrollTop = this.currentScrollTop;
       this.currentScrollTop = window.scrollY;
+
+      const scrollParams = {
+        window,
+        container: document.getElementById('images-container'),
+        totalLoadedImages: this.state.loadedImages && this.state.loadedImages.length,
+        loadedImages: this.state.loadedImages,
+        threshold: this.props.threshold,
+        imageFetchCount: this.props.imageFetchCount,
+        isLastImageFetched: this.isLastImageFetched,
+        startIndex: this.startIndex,
+        endIndex: this.endIndex,
+        updateStartIndex: this.updateStartIndex,
+        updateEndIndex: this.updateEndIndex,
+        updateState: this.updateState
+      }
+
       if (this.currentScrollTop <= this.prevScrollTop) {  // handling scroll up
-        this.scrollUp();
+        this.scrollUp(scrollParams);
       } else if (this.currentScrollTop > this.prevScrollTop) { // handling scroll down
-        this.scrollDown();
+        this.scrollDown(scrollParams);
       }
     }
   }
