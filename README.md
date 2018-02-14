@@ -1,6 +1,6 @@
 # react-image-viewer v1.0.0
 Image viewer with below capabilities:
-* 
+* infinite scrolling of images
 * images can be reordered by drag-drop
 * image details shown on hover
 
