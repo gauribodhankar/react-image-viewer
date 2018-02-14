@@ -66,7 +66,7 @@ class ImageViewer extends Component {
   getImageData(fetchStartIndex, fetchEndIndex) {
     return new Promise((resolve, reject) => {
       this.setState({ loading: true });
-      fetchImages('/data/imageData.json', fetchStartIndex, fetchEndIndex).then(({ images, isLastImageFetched }) => {
+      fetchImages('/src/data/imageData.json', fetchStartIndex, fetchEndIndex).then(({ images, isLastImageFetched }) => {
         if (images) {
           const imageArray = [];
           for (let index = 0, top = images.length; index < top; index = index + 2) {
