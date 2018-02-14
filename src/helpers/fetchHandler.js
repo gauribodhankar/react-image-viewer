@@ -13,9 +13,9 @@ export const fetchImages = (url, startIndex, endIndex) => new Promise((resolve, 
                 isLastImageFetched
             });
         } else {
-            reject('No images available. Please try again.');
+            reject('No images available, or Invalid props passed. Please try again.');
         }
     }).catch((error) => {
-        reject(error && error.toString()); // TODO: do we show technical errors to users?
+        reject(error && error.toString());
     });
 });

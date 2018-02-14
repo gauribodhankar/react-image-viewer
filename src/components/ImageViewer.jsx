@@ -39,12 +39,23 @@ class ImageViewer extends Component {
     this.updateState = this.updateState.bind(this);
   }
 
+  validateProps(props) {
+    if(props.threshold <= 0 || props.imageFetchCount < 0 || props.imageFetchCount > props.threshold) {
+      this.setErrorState('Invalid props passed to ImageViewer. Please correct them and try again.');
+      return false;
+    }
+    return true;
+    // TODO: More validations could be added here
+  }
+
   componentDidMount() {
     window.addEventListener('scroll', throttle(this.handleOnScroll, 100, { leading: true }));
   }
 
   componentWillMount() {
-    this.getImageData(this.startIndex, this.endIndex).then((images) => { this.updateState(images) });
+    if(this.validateProps(this.props)) {
+      this.getImageData(this.startIndex, this.endIndex).then((images) => { this.updateState(images) });
+    }
   }
 
   componentWillUpdate(nextProps, nextState) {

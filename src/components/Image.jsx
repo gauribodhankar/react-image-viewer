@@ -5,7 +5,7 @@ class Image extends Component {
     constructor(props) {
         super(props);
 
-        this.defaultImageUrl = './../images/img_not_available.png';
+        this.defaultImageUrl = './src/images/img_not_available.png';
         this.state = {
             url: props.url || this.defaultImageUrl
         }

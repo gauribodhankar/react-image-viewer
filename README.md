@@ -29,6 +29,6 @@ Note: Should work with other/higher versions, but if not, please use these versi
 * Desktop
 
 ## To-Dos
- * Adding validation for prop values
- * Adding an Error Boundary
+ * Adding more validations for prop values and handling invalid props
  * Extending support to different browsers & screen sizes
+ * Could try a different user experience like one with pages
