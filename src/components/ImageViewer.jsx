@@ -10,7 +10,6 @@ import throttle from 'lodash.throttle'
 
 class ImageViewer extends Component {
   static defaultProps = {
-    threshold: 180,
     imageFetchCount: 90
   }
   constructor(props) {
@@ -28,6 +27,7 @@ class ImageViewer extends Component {
     this.currentScrollTop = 0;  // to determine scroll up/down
     this.prevScrollTop = 0;     // to determine scroll up/down
     this.isLastImageFetched = false;  // to check if all images have been fetched
+    this.threshold = parseInt(props.imageFetchCount) * 3;   // maximum number of images that can be loaded on the page at a given time
 
     // first & last loaded image's index in the main image array( returned by the API ) in the current fetch call
     this.startIndex = 0;
@@ -37,15 +37,16 @@ class ImageViewer extends Component {
     this.updateStartIndex = this.updateStartIndex.bind(this);
     this.updateEndIndex = this.updateEndIndex.bind(this);
     this.updateState = this.updateState.bind(this);
+    this.getTotalLoadedImages = this.getTotalLoadedImages.bind(this);
   }
 
   validateProps(props) {
-    if(props.threshold <= 0 || props.imageFetchCount < 0 || props.imageFetchCount > props.threshold) {
+    if (props.imageFetchCount < 30 || props.imageFetchCount > 90) {
       this.setErrorState('Invalid props passed to ImageViewer. Please correct them and try again.');
       return false;
     }
     return true;
-    // TODO: More validations could be added here
+    // TODO: Only basic validations handled. More validations could be added here later
   }
 
   componentDidMount() {
@@ -53,7 +54,7 @@ class ImageViewer extends Component {
   }
 
   componentWillMount() {
-    if(this.validateProps(this.props)) {
+    if (this.validateProps(this.props)) {
       this.getImageData(this.startIndex, this.endIndex).then((images) => { this.updateState(images) });
     }
   }
@@ -84,7 +85,7 @@ class ImageViewer extends Component {
             const prevImage = images[index],
               nextImage = images[index + 1];
 
-            // combining the Converted Image and Deployment Target objects (assuming that both appear consecutively in the response)
+            // combining the Converted Image and Deployment Record objects (assuming that both appear consecutively in the response)
             if (prevImage.assetId === nextImage.assetId) {
               imageArray.push({
                 assetId: prevImage.assetId,
@@ -131,6 +132,10 @@ class ImageViewer extends Component {
     this.endIndex = newEndIndex;
   }
 
+  getTotalLoadedImages() {
+    return this.state.loadedImages && this.state.loadedImages.length;
+  }
+
   scrollUp({ window, totalLoadedImages, loadedImages, startIndex, endIndex, threshold, imageFetchCount, isLastImageFetched, updateStartIndex, updateEndIndex, updateState }) {
     if ((window.scrollY < 1000 || window.scrollY === 0) && (startIndex !== 0 && (totalLoadedImages === threshold || isLastImageFetched))) {
       const newStartIndex = (startIndex - imageFetchCount) < 0 ? 0 : (startIndex - imageFetchCount);
@@ -152,17 +157,18 @@ class ImageViewer extends Component {
     }
   }
 
-  scrollDown({ window, container, totalLoadedImages, loadedImages, startIndex, endIndex, threshold, imageFetchCount, isLastImageFetched, updateStartIndex, updateEndIndex, updateState }) {
-    if ((window.innerHeight + window.scrollY) >= (container.clientHeight - 1000)) {
+  scrollDown({ window, container, totalLoadedImages, loadedImages, startIndex, endIndex, threshold, imageFetchCount, isLastImageFetched, updateStartIndex, updateEndIndex, updateState, getTotalLoadedImages }) {
+    if ((window.innerHeight + window.scrollY) >= (container.clientHeight - 1500)) {
       if (!isLastImageFetched) {
-        if (totalLoadedImages === threshold) {
+        if (totalLoadedImages >= threshold) {
           updateStartIndex(startIndex + imageFetchCount);
         }
-        updateEndIndex(endIndex + imageFetchCount);
+        const newEndIndex = (endIndex + imageFetchCount);
+        updateEndIndex(newEndIndex);
 
-        this.getImageData(endIndex, endIndex + imageFetchCount).then((images) => {
+        this.getImageData(endIndex, newEndIndex).then((images) => {
           let updatedImages = [];
-          if (totalLoadedImages === threshold) {
+          if (getTotalLoadedImages() === threshold) {
             // removing from the start a certain number(imageFetchCount) of images from the loaded images to accomodate the additioanl images fetched on scroll down
             // appending new images at the end of the loaded images
             updatedImages = loadedImages.slice(imageFetchCount).concat(images);
@@ -187,14 +193,15 @@ class ImageViewer extends Component {
         container: document.getElementById('images-container'),
         totalLoadedImages: this.state.loadedImages && this.state.loadedImages.length,
         loadedImages: this.state.loadedImages,
-        threshold: parseInt(this.props.threshold),
+        threshold: this.threshold,
         imageFetchCount: parseInt(this.props.imageFetchCount),
         isLastImageFetched: this.isLastImageFetched,
         startIndex: this.startIndex,
         endIndex: this.endIndex,
         updateStartIndex: this.updateStartIndex,
         updateEndIndex: this.updateEndIndex,
-        updateState: this.updateState
+        updateState: this.updateState,
+        getTotalLoadedImages: this.getTotalLoadedImages
       }
 
       if (this.currentScrollTop <= this.prevScrollTop) {  // handling scroll up
@@ -247,11 +254,8 @@ class ImageViewer extends Component {
     )
   }
 }
-/* Checking for prop types
-Note: Validation of prop values has not yet been included
-*/
+// Checking for prop types
 ImageViewer.propTypes = {
-  threshold: propTypes.number,
   imageFetchCount: propTypes.number
 }
 export default ImageViewer

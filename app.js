@@ -8,8 +8,7 @@ ReactDOM.render(
 <div className="image-viewer-app-main"> 
     <ErrorBoundary>
         <ImageViewer 
-            threshold={180}          // maximum number of images that can be loaded on the page at a given time
-            imageFetchCount={90}    // number of images to fetch on each call
+            imageFetchCount={90}    // number of images to fetch on each call - enter a postive number between 30 & 90
         />
     </ErrorBoundary>
 </div>, document.getElementById('app'))
