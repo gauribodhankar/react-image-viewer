@@ -3,7 +3,6 @@ import React from 'react'
 const MainKeySet = (props) => {
 
     const numberClicked = (number) => {
-        console.log(number);
         props.onNumberSelected(number);
     }
     const decimalClicked = () => {
@@ -11,6 +10,7 @@ const MainKeySet = (props) => {
     }
     const enterClicked = () => {
         console.log('enter');
+        props.onEnter();
     }
 
     return (

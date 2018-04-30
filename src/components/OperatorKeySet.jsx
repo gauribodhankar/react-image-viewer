@@ -3,12 +3,10 @@ import React from 'react'
 const OperatorKeySet = (props) => {
 
     const add = () => {
-        console.log('add');
-        // TODO
+        props.onAdd();
     }
     const subtract = () => {
-        console.log('subtract');
-        // TODO
+        props.onSubtract();
     }
     const multiply = () => {
         console.log('Currently not available');
