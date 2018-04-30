@@ -1,5 +1,8 @@
 import React,{Component} from 'react'
 import CalulatorDisplay from './CalculatorDisplay.jsx'
+import MainKeySet from './MainKeySet.jsx'
+import OperatorKeySet from './OperatorKeySet.jsx'
+import AdvancedKeySet from './AdvancedKeySet.jsx'
 
 class RPNCalculator extends Component {
 
@@ -9,14 +12,16 @@ class RPNCalculator extends Component {
     
     render() {
         return (
-            <div>
-                <section id="input-output-container">
+            <div className="rpn-calculator-component">
+                <section className="input-output-container">
                     <CalulatorDisplay
                         input={100} />
                 </section>
 
-                <section id="operations-container">
-
+                <section className="operations-container">
+                    <MainKeySet />
+                    <OperatorKeySet />
+                    <AdvancedKeySet />
                 </section>
             </div>
         );

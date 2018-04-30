@@ -12,11 +12,9 @@ class CalulatorDisplay extends Component {
 
     render() {
         return (<div>
-            <input 
-                type="text" 
-                id="display" 
-                value={this.state.input} 
-                readOnly />
+            <label className="input-output-display">
+                {this.state.input}
+            </label>
         </div>);
     }
 
