@@ -7,6 +7,7 @@
         font-family: Arial, Helvetica, sans-serif;
         display: flex;
         flex-direction: column;
+        border-radius: 5px;
 
         .input-output-container {
             .input-output-display {
@@ -32,6 +33,7 @@
                 float: left;
                 margin: 5px;
                 border: 1px solid gray;
+                border-radius: 3px;
                 text-align: center;
                 font-size: 18px;
                 color: white;
