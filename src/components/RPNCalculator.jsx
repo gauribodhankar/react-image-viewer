@@ -8,20 +8,47 @@ class RPNCalculator extends Component {
 
     constructor (props) {
         super(props);
+
+        this.state = {
+            currentInput: 100,
+            expression: 10,
+            stack: []
+        }
+        this.clear = this.clear.bind(this);
+        this.clearLastEntry = this.clearLastEntry.bind(this);
     }
+
+    componentWillUpdate(nextProps, nextState) {
+        // this.setState({ expression:0 });
+      }
     
+    clear() {
+        console.log('clear');
+        this.setState({ currentInput:0 });
+    }
+    clearLastEntry() {
+        this.setState({ currentInput:0 });
+        // also update the expression
+    }
+
     render() {
         return (
             <div className="rpn-calculator-component">
                 <section className="input-output-container">
                     <CalulatorDisplay
-                        input={100} />
+                        input={this.state.currentInput} />
                 </section>
 
-                <section className="operations-container">
-                    <MainKeySet />
+                <section className="keypad-container">
+                    <AdvancedKeySet 
+                        onClear={()=> this.clear()}
+                        onClearLast={() => this.clearLastEntry()} />
+                    <MainKeySet 
+                        onNumberSelected={(number) => {
+                            this.setState({ currentInput: number });
+                        }}/>
                     <OperatorKeySet />
-                    <AdvancedKeySet />
+                    
                 </section>
             </div>
         );

@@ -3,10 +3,8 @@
         position: relative;
         height: 500px;
         width: 700px;
-        border: 2px solid black;
-        // display: flex;
-        // flex-direction: column;
-        // justify-content: center;
+        background-color: black;
+        font-family: Arial, Helvetica, sans-serif;
 
         .input-output-container {
             height: 10%;
@@ -20,23 +18,51 @@
                 width: 80%;
                 margin: 10px 5px 0 5px;
                 font-size: 24px;
-                font-family: Arial, Helvetica, sans-serif;
                 border: 1px solid lightgray;
                 background-color: white;
             }
         }
 
-        button {
-            height: 30px;
-            width: 50px;
-            float: left;
-            margin: 5px;
-            border: 1px solid gray;
-            text-align: center;
-        }
+        .keypad-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
 
-        .basic-operations {
-            width: 200px;
+            button {
+                height: 40px;
+                width: 60px;
+                float: left;
+                margin: 5px;
+                border: 1px solid gray;
+                text-align: center;
+                font-size: 18px;
+                color: white;
+            }
+            .btn-number {
+                background: dimgray;
+            }
+            .btn-basic-oper {
+                background: orange;
+            }
+            .btn-adv-oper {
+                background: cadetblue;
+            }
+            .btn-enter {
+                background: green;
+            }
+            .btn-cancel {
+                background: brown;
+            }
+            .btn-long {
+                width: 130px;
+            }
+            .key-set {
+                overflow-y: auto;
+                width: 210px;
+            }
+            .operator-key-set {
+                width: 70px;
+            }
         }
     }
     .error-boundary-container {

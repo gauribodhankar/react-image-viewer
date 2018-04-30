@@ -1,23 +1,14 @@
-import React, { Component } from 'react'
+import React from 'react'
 
-class CalulatorDisplay extends Component {
+const CalulatorDisplay = (props) => {
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            input: props.input
-        }
-    }
-
-    render() {
-        return (<div>
+    return (
+        <div>
             <label className="input-output-display">
-                {this.state.input}
+                {props.input}
             </label>
-        </div>);
-    }
-
+        </div>
+    );
 }
 
 export default CalulatorDisplay

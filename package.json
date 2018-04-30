@@ -10,9 +10,6 @@
   "author": "Gauri Bodhankar",
   "license": "ISC",
   "dependencies": {
-    "dateformat": "^3.0.2",
-    "lodash.debounce": "^4.0.8",
-    "lodash.throttle": "^4.1.1",
     "node-sass": "^4.7.2",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",

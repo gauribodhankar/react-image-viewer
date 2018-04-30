@@ -4,24 +4,25 @@ const OperatorKeySet = (props) => {
 
     const add = () => {
         console.log('add');
+        // TODO
     }
     const subtract = () => {
         console.log('subtract');
+        // TODO
     }
     const multiply = () => {
-        console.log('multiply');
+        console.log('Currently not available');
     }
     const divide = () => {
-        console.log('divide');
+        console.log('Currently not available');
     }
 
     return (
-        <div className="basic-operations">
-            <button onClick={() => divide()}>&divide;</button>
-            <button onClick={() => multiply()}>&times;</button>
-            <button onClick={() => subtract()}>-</button>
-            <button onClick={() => add()}>+</button>
-            <button onClick={() => squareRoot()}>&radic;</button>
+        <div className="key-set operator-key-set">
+            <button className="btn-basic-oper" onClick={() => divide()}>&divide;</button>
+            <button className="btn-basic-oper" onClick={() => multiply()}>&times;</button>
+            <button className="btn-basic-oper" onClick={() => subtract()}>-</button>
+            <button className="btn-basic-oper" onClick={() => add()}>+</button>
         </div>
     )
   };
