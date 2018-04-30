@@ -1,22 +1,20 @@
 .rpn-calculator-app-main {
     .rpn-calculator-component {
         position: relative;
-        height: 500px;
-        width: 700px;
+        height: 275px;
+        width: 500px;
         background-color: black;
         font-family: Arial, Helvetica, sans-serif;
+        display: flex;
+        flex-direction: column;
 
         .input-output-container {
-            height: 10%;
-            width: 100%;
-            background-color: darkgrey;
-
             .input-output-display {
                 float: right;
                 text-align: right;
-                height: 80%;
-                width: 80%;
-                margin: 10px 5px 0 5px;
+                width: 473px;
+                margin: 20px 10px 15px 10px;
+                padding-right: 5px;
                 font-size: 24px;
                 border: 1px solid lightgray;
                 background-color: white;
