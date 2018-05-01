@@ -12,7 +12,6 @@ class RPNCalculator extends Component {
 
         this.state = {
             currentInput: 0,
-            expression: '',
             stack: []
         }
         this.clear = this.clear.bind(this);
@@ -20,28 +19,34 @@ class RPNCalculator extends Component {
         this.pushToStack = this.pushToStack.bind(this);
         this.add = this.add.bind(this);
         this.subtract = this.subtract.bind(this);
+        this.updateState = this.updateState.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
     }
     
-    clear() {
-        this.setState({ currentInput:0, expression:'', stack:[] });
+    componentDidMount() {
+        document.addEventListener('keydown', this.handleKeyDown)
+    }
+      
+    componentWillUnmount() {
+        document.removeEventListener('keydown', this.handleKeyDown);
     }
 
-    setNumber(number) {
+    clear = () => {
+        this.setState({ currentInput:0, stack:[] });
+    }
+
+    setNumber = (number) => {
         const input = this.state.currentInput.toString() === '0' ? number : `${this.state.currentInput}${number}`;
         this.setState({
             currentInput: input
         });
     }
 
-    pushToStack() {
+    pushToStack = () => {
         let stack = this.state.stack;
         stack.push(this.state.currentInput);
 
-        this.setState({
-            currentInput: 0,
-            expression: stack.join(' '),
-            stack
-        });
+        this.updateState(0, stack);
     }
 
     add = () => {
@@ -49,11 +54,7 @@ class RPNCalculator extends Component {
             input = this.state.currentInput,
             result = stack.length > 0 ? (parseFloat(stack.pop()) + parseFloat(input)) : input;
 
-        this.setState({
-            currentInput: result,
-            expression: stack.join(' '),
-            stack
-        });
+        this.updateState(result, stack);
     }
     
     subtract = () => {
@@ -61,12 +62,30 @@ class RPNCalculator extends Component {
             input = this.state.currentInput,
             result = stack.length > 0 ? (parseFloat(stack.pop()) - parseFloat(input)) : input;
 
+        this.updateState(result, stack);
+    }
+
+    updateState = (currentInput, stack) => {
         this.setState({
-            currentInput: result,
-            expression: stack.join(' '),
+            currentInput,
             stack
         });
     }
+
+    handleKeyDown = (event) => {
+        const { key } = event;
+        
+        if ((/\d/).test(key)) {  
+          event.preventDefault();
+          this.setNumber(parseInt(key));
+        } else if (key === '+') {
+          this.add();
+        } else if (key === '-') {
+          this.subtract();
+        } else if (key === 'Enter') {
+          this.pushToStack();
+        }
+      }
 
     render() {
         return (
@@ -74,7 +93,7 @@ class RPNCalculator extends Component {
                 <section className="input-output-container">
                     <CalulatorDisplay
                         input={this.state.currentInput}
-                        stack={this.state.expression}/>
+                        stack={ this.state.stack.join(' ') }/>
                 </section>
 
                 <section className="keypad-container">
