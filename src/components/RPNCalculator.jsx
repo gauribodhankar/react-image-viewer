@@ -47,7 +47,7 @@ class RPNCalculator extends Component {
     add = () => {
         let stack = this.state.stack,
             input = this.state.currentInput,
-            result = stack.length > 0 ? (parseFloat(input) + parseFloat(stack.pop())) : input;
+            result = stack.length > 0 ? (parseFloat(stack.pop()) + parseFloat(input)) : input;
 
         this.setState({
             currentInput: result,
@@ -59,7 +59,7 @@ class RPNCalculator extends Component {
     subtract = () => {
         let stack = this.state.stack,
             input = this.state.currentInput,
-            result = stack.length > 0 ? (parseFloat(input) - parseFloat(stack.pop())) : input;
+            result = stack.length > 0 ? (parseFloat(stack.pop()) - parseFloat(input)) : input;
 
         this.setState({
             currentInput: result,
