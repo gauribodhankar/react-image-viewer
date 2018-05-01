@@ -7,6 +7,6 @@ import './src/styles/rpnCalculator.scss'
 ReactDOM.render(
 <div className="rpn-calculator-app-main"> 
     <ErrorBoundary>
-        <RPNCalculator />
+        <RPNCalculator STACK_SIZE={1}/>
     </ErrorBoundary>
 </div>, document.getElementById('app'))

@@ -1,20 +1,23 @@
-import React,{Component} from 'react'
+import React, { Component } from 'react'
+import propTypes from 'prop-types'
 import CalulatorDisplay from './CalculatorDisplay.jsx'
 import MainKeySet from './MainKeySet.jsx'
 import OperatorKeySet from './OperatorKeySet.jsx'
 import AdvancedKeySet from './AdvancedKeySet.jsx'
 
-const EMPTY_STRING = '';
 class RPNCalculator extends Component {
 
-    constructor (props) {
+    static defaultProps = {
+        STACK_SIZE: 10
+    }
+
+    constructor(props) {
         super(props);
 
         this.state = {
             currentInput: 0,
             stack: []
         }
-        this.clear = this.clear.bind(this);
         this.setNumber = this.setNumber.bind(this);
         this.pushToStack = this.pushToStack.bind(this);
         this.add = this.add.bind(this);
@@ -22,47 +25,60 @@ class RPNCalculator extends Component {
         this.updateState = this.updateState.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
     }
-    
+
     componentDidMount() {
+        // to allow entering numbers using the keyboard
         document.addEventListener('keydown', this.handleKeyDown)
     }
-      
+
     componentWillUnmount() {
         document.removeEventListener('keydown', this.handleKeyDown);
     }
 
-    clear = () => {
-        this.setState({ currentInput:0, stack:[] });
-    }
-
     setNumber = (number) => {
-        const input = this.state.currentInput.toString() === '0' ? number : `${this.state.currentInput}${number}`;
-        this.setState({
-            currentInput: input
-        });
+        const input = this.state.currentInput;
+        console.log(this.hasDecimal(input), number);
+        if(!(number === '.' && this.hasDecimal(input))) { // to stop user from entering more than one decimal point
+            const currentInput = input.toString() === '0' ? number : `${input}${number}`;
+            this.setState({ currentInput });
+        }
     }
 
     pushToStack = () => {
-        let stack = this.state.stack;
-        stack.push(this.state.currentInput);
+        if (this.state.currentInput !== '.') {
+            let stack = this.state.stack;
 
-        this.updateState(0, stack);
+            if(stack.length !== this.props.STACK_SIZE) {
+                stack.push(parseFloat(this.state.currentInput));
+                this.updateState(0, stack);
+            } else {
+                // TODO: Show error message
+            }
+        } else {
+            this.setState({ currentInput: 0 });
+        }
     }
 
     add = () => {
         let stack = this.state.stack,
-            input = this.state.currentInput,
-            result = stack.length > 0 ? (parseFloat(stack.pop()) + parseFloat(input)) : input;
-
-        this.updateState(result, stack);
+            input = this.state.currentInput;
+        if(this.hasDecimal(input) && isNaN(input)) {
+            this.setState({ currentInput: 0 });
+        }  else {
+            const result = stack.length > 0 ? (stack.pop() + parseFloat(input)) : input;
+            this.updateState(result, stack);
+        }
     }
-    
+
     subtract = () => {
         let stack = this.state.stack,
-            input = this.state.currentInput,
-            result = stack.length > 0 ? (parseFloat(stack.pop()) - parseFloat(input)) : input;
-
-        this.updateState(result, stack);
+            input = this.state.currentInput;
+        if(this.hasDecimal(input) && isNaN(input)) {
+            this.setState({ currentInput: 0 });
+        }  else {
+            const result = stack.length > 0 ? (stack.pop() - parseFloat(input)) : input;
+            this.updateState(result, stack);
+        }
     }
 
     updateState = (currentInput, stack) => {
@@ -74,18 +90,27 @@ class RPNCalculator extends Component {
 
     handleKeyDown = (event) => {
         const { key } = event;
-        
-        if ((/\d/).test(key)) {  
-          event.preventDefault();
-          this.setNumber(parseInt(key));
+
+        if ((/\d/).test(key)) {
+            event.preventDefault();
+            this.setNumber(parseInt(key));
+        } else if (key === '.') {
+            if (!this.hasDecimal(this.state.currentInput)) { // to stop user from entering more than one decimal point
+                this.setNumber(key);
+            }
         } else if (key === '+') {
-          this.add();
+            this.add();
         } else if (key === '-') {
-          this.subtract();
+            this.subtract();
         } else if (key === 'Enter') {
-          this.pushToStack();
+            this.pushToStack();
         }
-      }
+    }
+
+    /* To check if the input passed has a decimal in it */
+    hasDecimal = (input) => {
+        return input.toString().indexOf('.') !== -1;
+    }
 
     render() {
         return (
@@ -93,16 +118,17 @@ class RPNCalculator extends Component {
                 <section className="input-output-container">
                     <CalulatorDisplay
                         input={this.state.currentInput}
-                        stack={ this.state.stack.join(' ') }/>
+                        stack={this.state.stack.join(' ')} />
                 </section>
 
                 <section className="keypad-container">
-                    <AdvancedKeySet 
-                        onClear={()=> this.clear()}/>
-                    <MainKeySet 
+                    <AdvancedKeySet
+                        onClear={() => this.updateState(0, [])}
+                        onClearLast={() => { this.setState({ currentInput: 0 }) }} />
+                    <MainKeySet
                         onNumberClick={(number) => { this.setNumber(number); }}
-                        onEnter={() => { this.pushToStack(); }}/>
-                    <OperatorKeySet 
+                        onEnter={() => { this.pushToStack(); }} />
+                    <OperatorKeySet
                         onAdd={() => { this.add(); }}
                         onSubtract={() => { this.subtract(); }}
                     />
@@ -110,6 +136,10 @@ class RPNCalculator extends Component {
             </div>
         );
     }
+}
+// Checking for prop types
+RPNCalculator.propTypes = {
+    STACK_SIZE: propTypes.number
 }
 
 export default RPNCalculator 

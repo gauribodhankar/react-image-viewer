@@ -1,6 +1,6 @@
 import React from 'react'
 
-const CalulatorDisplay = ({input, stack}) => {
+const CalulatorDisplay = ({ input, stack }) => {
 
     return (
         <div className="calculator-display">

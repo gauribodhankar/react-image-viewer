@@ -1,6 +1,6 @@
 import React from 'react'
 
-const OperatorKeySet = ({onAdd, onSubtract}) => {
+const OperatorKeySet = ({ onAdd, onSubtract }) => {
 
     return (
         <div className="key-set operator-key-set">
@@ -10,6 +10,6 @@ const OperatorKeySet = ({onAdd, onSubtract}) => {
             <button className="btn-basic-oper" onClick={() => onAdd()}>+</button>
         </div>
     )
-  };
+};
 
 export default OperatorKeySet
