@@ -74,6 +74,9 @@
             }
         }
     }
+    .hidden {
+        display: none;
+    }
     .error-boundary-container {
         display: flex;
         justify-content: center;

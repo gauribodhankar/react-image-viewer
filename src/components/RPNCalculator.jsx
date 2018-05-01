@@ -4,6 +4,7 @@ import CalulatorDisplay from './CalculatorDisplay.jsx'
 import MainKeySet from './MainKeySet.jsx'
 import OperatorKeySet from './OperatorKeySet.jsx'
 import AdvancedKeySet from './AdvancedKeySet.jsx'
+import Error from './Error.jsx'
 
 class RPNCalculator extends Component {
 
@@ -16,7 +17,9 @@ class RPNCalculator extends Component {
 
         this.state = {
             currentInput: 0,
-            stack: []
+            stack: [],
+            errorClass: 'hidden',
+            errorMsg: ''
         }
         this.setNumber = this.setNumber.bind(this);
         this.pushToStack = this.pushToStack.bind(this);
@@ -51,7 +54,7 @@ class RPNCalculator extends Component {
                 stack.push(parseFloat(this.state.currentInput));
                 this.updateState(0, stack);
             } else {
-                // TODO: Show error message
+                this.setErrorState('', 'Stack is full. Please perform some operations to clear it and try again.');
             }
         } else {
             this.setState({ currentInput: 0 });
@@ -85,7 +88,15 @@ class RPNCalculator extends Component {
             currentInput,
             stack
         });
+        this.state.errorMsg && this.setErrorState('hidden', '');
     }
+
+    setErrorState = (errorClass, errorMsg) => {
+        this.setState({
+          errorClass,
+          errorMsg
+        });
+      }
 
     handleKeyDown = (event) => {
         const { key } = event;
@@ -114,6 +125,11 @@ class RPNCalculator extends Component {
     render() {
         return (
             <div className="rpn-calculator-component">
+                <section id='error-container' className={`error-container ${this.state.errorClass}`}>
+                    <Error
+                        errorMessage={this.state.errorMsg}>
+                    </Error>
+                </section>
                 <section className="input-output-container">
                     <CalulatorDisplay
                         input={this.state.currentInput}
