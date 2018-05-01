@@ -1,24 +1,20 @@
 import React from 'react'
 
-const AdvancedKeySet = (props) => {
-
-    const advancedOperationSelected = () => {
-        console.log('Currently not available');
-    }
+const AdvancedKeySet = ({onClear, onClearLast}) => {
 
     return (
         <div className="key-set">
-            <button className="btn-cancel btn-long" onClick={() => props.onClear()}>C</button>
-            <button className="btn-cancel" onClick={() => props.onClearLast()}>CE</button>
-            <button className="btn-adv-oper" onClick={() => advancedOperationSelected()}>sin</button>
-            <button className="btn-adv-oper" onClick={() => advancedOperationSelected()}>cos</button>
-            <button className="btn-adv-oper" onClick={() => advancedOperationSelected()}>tan</button>
-            <button className="btn-adv-oper" onClick={() => advancedOperationSelectedadd()}>&radic;</button>
-            <button className="btn-adv-oper" onClick={() => advancedOperationSelectedadd()}>&pi;</button>
-            <button className="btn-adv-oper" onClick={() => advancedOperationSelectedadd()}>%</button>
-            <button className="btn-adv-oper" onClick={() => advancedOperationSelectedadd()}>M</button>
-            <button className="btn-adv-oper" onClick={() => advancedOperationSelected()}>&rarr;ME</button>
-            <button className="btn-adv-oper" onClick={() => advancedOperationSelected()}>+/-</button>
+            <button className="btn-cancel btn-long" onClick={() => onClear()}>C</button>
+            <button className="btn-cancel" onClick={() => onClearLast()}>CE</button>
+            <button className="btn-adv-oper" disabled>sin</button>
+            <button className="btn-adv-oper" disabled>cos</button>
+            <button className="btn-adv-oper" disabled>tan</button>
+            <button className="btn-adv-oper" disabled>&radic;</button>
+            <button className="btn-adv-oper" disabled>&pi;</button>
+            <button className="btn-adv-oper" disabled>%</button>
+            <button className="btn-adv-oper" disabled>M</button>
+            <button className="btn-adv-oper" disabled>&rarr;ME</button>
+            <button className="btn-adv-oper" disabled>+/-</button>
         </div>
     )
 }

@@ -8,9 +8,6 @@ const MainKeySet = ({onNumberClick, onEnter}) => {
     const decimalClicked = () => {
         console.log('Currently not available');
     }
-    const enterClicked = () => {
-        onEnter();
-    }
 
     return (
         <div className="key-set">
@@ -23,9 +20,9 @@ const MainKeySet = ({onNumberClick, onEnter}) => {
             <button className="btn-number" onClick={() => numberClicked(1)}>1</button>
             <button className="btn-number" onClick={() => numberClicked(2)}>2</button>
             <button className="btn-number" onClick={() => numberClicked(3)}>3</button>
-            <button className="btn-number" onClick={() => decimalClicked()}>.</button>
+            <button className="btn-number" onClick={() => numberClicked('.')}>.</button>
             <button className="btn-number" onClick={() => numberClicked(0)}>0</button>
-            <button className="btn-enter" onClick={() => enterClicked()}>&crarr;</button>
+            <button className="btn-enter" onClick={() => onEnter()}>&crarr;</button>
         </div>
     )
   };

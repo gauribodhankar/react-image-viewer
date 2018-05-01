@@ -27,7 +27,6 @@
                 }
             }
         }
-
         .keypad-container {
             display: flex;
             flex-direction: row;
@@ -44,6 +43,9 @@
                 text-align: center;
                 font-size: 18px;
                 color: white;
+            }
+            button:enabled {
+                cursor: pointer;
             }
             .btn-number {
                 background: dimgray;

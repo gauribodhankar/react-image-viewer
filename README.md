@@ -31,3 +31,4 @@ Note: Should work with other/higher versions, but if not, please use these versi
 ## To-Dos
  * Making the app responsive
  * Adding implementing all operations
+ * Adding unit tests
