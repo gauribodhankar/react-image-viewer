@@ -37,7 +37,6 @@ class RPNCalculator extends Component {
 
     setNumber = (number) => {
         const input = this.state.currentInput;
-        console.log(this.hasDecimal(input), number);
         if(!(number === '.' && this.hasDecimal(input))) { // to stop user from entering more than one decimal point
             const currentInput = input.toString() === '0' ? number : `${input}${number}`;
             this.setState({ currentInput });
