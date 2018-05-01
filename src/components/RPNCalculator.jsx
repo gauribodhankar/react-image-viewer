@@ -44,6 +44,7 @@ class RPNCalculator extends Component {
             const currentInput = input.toString() === '0' ? number : `${input}${number}`;
             this.setState({ currentInput });
         }
+        // TODO: Can introduce integer limit / range
     }
 
     pushToStack = () => {

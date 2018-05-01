@@ -3,6 +3,7 @@ Reverse Polish Calculator with below capabilities:
 * Add (+)
 * Subtract (-)
 * Clear All (C)
+* Clear Entry (CE)
 
 ## Installation
 * Install node & npm
@@ -23,12 +24,13 @@ Note: Should work with other/higher versions, but if not, please use these versi
 
 
 ## Browser Support
-* Chrome
+* Chrome (Tested on Mac+Chrome)
 
 ## Device support
-* Desktop
+* Desktop/Laptop
 
 ## To-Dos
- * Making the app responsive
- * Adding implementing all operations
+ * Making the app responsive to different device/screen sizes
+ * Adding implementation for all operations
+ * Adding validations
  * Adding unit tests
