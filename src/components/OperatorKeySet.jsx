@@ -1,12 +1,12 @@
 import React from 'react'
 
-const OperatorKeySet = (props) => {
+const OperatorKeySet = ({onAdd, onSubtract}) => {
 
     const add = () => {
-        props.onAdd();
+        onAdd();
     }
     const subtract = () => {
-        props.onSubtract();
+        onSubtract();
     }
     const multiply = () => {
         console.log('Currently not available');

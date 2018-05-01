@@ -1,16 +1,15 @@
 import React from 'react'
 
-const MainKeySet = (props) => {
+const MainKeySet = ({onNumberClick, onEnter}) => {
 
     const numberClicked = (number) => {
-        props.onNumberSelected(number);
+        onNumberClick(number);
     }
     const decimalClicked = () => {
-        console.log('.');
+        console.log('Currently not available');
     }
     const enterClicked = () => {
-        console.log('enter');
-        props.onEnter();
+        onEnter();
     }
 
     return (

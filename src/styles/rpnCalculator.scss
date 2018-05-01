@@ -10,15 +10,21 @@
         border-radius: 5px;
 
         .input-output-container {
-            .input-output-display {
-                float: right;
-                text-align: right;
-                width: 473px;
-                margin: 20px 10px 15px 10px;
-                padding-right: 5px;
-                font-size: 24px;
-                border: 1px solid lightgray;
-                background-color: white;
+            .calculator-display {
+                margin: 10px;
+                overflow: auto;
+
+                .input-output-display {
+                    float: right;
+                    text-align: right;
+                    width: 473px;
+                    min-height: 30px;
+                    padding-right: 5px;
+                    font-size: 24px;
+                    margin: 5px;
+                    border: 1px solid lightgray;
+                    background-color: white;
+                }
             }
         }
 

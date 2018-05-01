@@ -12,53 +12,60 @@ class RPNCalculator extends Component {
 
         this.state = {
             currentInput: 0,
-            expression: 0,
+            expression: '',
             stack: []
         }
         this.clear = this.clear.bind(this);
-        this.clearLastEntry = this.clearLastEntry.bind(this);
-        this.updateState = this.updateState.bind(this);
+        this.setNumber = this.setNumber.bind(this);
+        this.pushToStack = this.pushToStack.bind(this);
+        this.add = this.add.bind(this);
+        this.subtract = this.subtract.bind(this);
     }
-
-    componentWillUpdate(nextProps, nextState) {
-        // let nextStack = [];
-        // console.log(nextProps, nextState);
-        // nextState.expression = (nextState.expression === 0) ? nextState.currentInput : nextState.expression + EMPTY_STRING + nextState.currentInput;
-        // nextStack.push(nextState.input);
-
-        // this.setState ({
-        //     expression: nextState.expression,
-        //     stack: nextStack
-        // });
-      }
     
     clear() {
-        this.setState({ currentInput:0, expression:0 });
-    }
-    clearLastEntry() {
-        this.setState({ currentInput:0 });
-        // also update the expression
+        this.setState({ currentInput:0, expression:'', stack:[] });
     }
 
-    updateState(currentState, isEnter, input) {
-        let nextState = {}, nextStack = [];
-        nextState.expression = (currentState.expression === 0) ? currentState.currentInput : currentState.expression + EMPTY_STRING + currentState.currentInput;
-        
-        if(isEnter) {
-            nextStack.push(currentState.input);
-            this.setState ({
-                currentInput: input,
-                expression: nextState.expression,
-                stack: nextStack
-            });
-        } else {
-            this.setState ({
-                currentInput: input,
-                expression: nextState.expression
-            });
-        }
+    setNumber(number) {
+        const input = this.state.currentInput.toString() === '0' ? number : `${this.state.currentInput}${number}`;
+        this.setState({
+            currentInput: input
+        });
+    }
 
-        
+    pushToStack() {
+        let stack = this.state.stack;
+        stack.push(this.state.currentInput);
+
+        this.setState({
+            currentInput: 0,
+            expression: stack.join(' '),
+            stack
+        });
+    }
+
+    add = () => {
+        let stack = this.state.stack,
+            input = this.state.currentInput,
+            result = stack.length > 0 ? (parseFloat(input) + parseFloat(stack.pop())) : input;
+
+        this.setState({
+            currentInput: result,
+            expression: stack.join(' '),
+            stack
+        });
+    }
+    
+    subtract = () => {
+        let stack = this.state.stack,
+            input = this.state.currentInput,
+            result = stack.length > 0 ? (parseFloat(input) - parseFloat(stack.pop())) : input;
+
+        this.setState({
+            currentInput: result,
+            expression: stack.join(' '),
+            stack
+        });
     }
 
     render() {
@@ -66,29 +73,20 @@ class RPNCalculator extends Component {
             <div className="rpn-calculator-component">
                 <section className="input-output-container">
                     <CalulatorDisplay
-                        input={this.state.expression} />
+                        input={this.state.currentInput}
+                        stack={this.state.expression}/>
                 </section>
 
                 <section className="keypad-container">
                     <AdvancedKeySet 
-                        onClear={()=> this.clear()}
-                        onClearLast={() => this.clearLastEntry()} />
+                        onClear={()=> this.clear()}/>
                     <MainKeySet 
-                        onNumberSelected={(number) => {
-                            this.updateState(this.state, false, number);
-                        }}
-                        onEnter={() => {
-                            this.updateState(this.state, true, '\n');
-                        }}/>
+                        onNumberClick={(number) => { this.setNumber(number); }}
+                        onEnter={() => { this.pushToStack(); }}/>
                     <OperatorKeySet 
-                        onAdd={() => {
-                            this.updateState(this.state, false, '+');
-                        }}
-                        onSubtract={() => {
-                            this.updateState(this.state, false, '-');
-                        }}
+                        onAdd={() => { this.add(); }}
+                        onSubtract={() => { this.subtract(); }}
                     />
-                    
                 </section>
             </div>
         );

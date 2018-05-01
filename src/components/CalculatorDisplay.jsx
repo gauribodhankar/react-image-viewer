@@ -1,11 +1,16 @@
 import React from 'react'
 
-const CalulatorDisplay = (props) => {
+const CalulatorDisplay = ({input, stack}) => {
 
     return (
-        <label className="input-output-display">
-            {props.input}
-        </label>
+        <div className="calculator-display">
+            <label className="input-output-display">
+                {stack}
+            </label>
+            <label className="input-output-display">
+                {input}
+            </label>
+        </div>
     );
 }
 
