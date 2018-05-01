@@ -1,12 +1,12 @@
-# react-image-viewer v1.0.0
-Image viewer with below capabilities:
-* infinite scrolling of images
-* images can be reordered by drag-drop
-* image details shown on hover
+# react-rpn-calculator v1.0.0
+Reverse Polish Calculator with below capabilities:
+* Add (+)
+* Subtract (-)
+* Clear All (C)
 
 ## Installation
 * Install node & npm
-* If node & npm are already installed, navigate to the 'react-image-viewer' folder and run the below commands:
+* If node & npm are already installed, navigate to the 'react-rpn-calculator' folder and run the below commands:
 
 ```bash
 npm install --registry=https://registry.npmjs.org/ 
@@ -29,6 +29,5 @@ Note: Should work with other/higher versions, but if not, please use these versi
 * Desktop
 
 ## To-Dos
- * Adding more validations for prop values and handling invalid props
- * Extending support to different browsers & screen sizes
- * Could try a different user experience like one with pages
+ * Making the app responsive
+ * Adding implementing all operations

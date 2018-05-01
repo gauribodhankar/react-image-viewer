@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.html",
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "webpack-dev-server --devtool=eval-source-map",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Gauri Bodhankar",
